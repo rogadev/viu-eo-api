@@ -9,6 +9,7 @@ async function run() {
 
   let data = []
 
+  // NOC 2021 Version 1.0
   await page.goto(
     'https://www23.statcan.gc.ca/imdb/p3VD.pl?Function=getVD&TVD=1322554'
   )
