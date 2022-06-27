@@ -10,7 +10,7 @@ module.exports = (app) => {
   })
 
   // TODO: Add routes, use controllers.
-  router.get('/scrape/2016', (req, res) => scrape.noc2016(req, res))
+  router.get('/scrape/2016', scrape.noc2016)
 
   // Connect routes in /api/v1/ to the Express app.
   app.use('/api/v1/', router)
