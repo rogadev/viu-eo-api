@@ -5,11 +5,14 @@ const colors = require('colors')
 const express = require('express')
 const app = express()
 
+// ROUTER
+const routes = require('./app/routes')
+
 // MIDDLEWARE
 app.use(express.json())
 
 // API V1 ROUTES
-require('./app/routes/api/v1')(app)
+app.use('/', routes)
 
 // START SERVER
 app.listen(3000, () => {
