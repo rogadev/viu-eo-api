@@ -45,3 +45,16 @@ exports.findSearchable = function (req, res) {
 exports.findAll = function (req, res) {
   res.json(allPrograms)
 }
+
+/**
+ * Return area based on program NID
+ */
+exports.findAreaByProgram = function (req, res) {
+  const programNid = req.params.nid
+  const area = programAreas.find((area) => n(area.nid) === n(programNid))
+  if (area) {
+    res.json(area)
+  } else {
+    res.status(404).send('Not found')
+  }
+}
