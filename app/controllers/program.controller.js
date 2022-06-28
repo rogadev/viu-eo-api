@@ -2,12 +2,16 @@ const allPrograms = require('../data/viu/program_areas.json')
 const searchablePrograms = require('../data/viu/searchable_programs.json')
 const programAreas = require('../data/viu/program_areas.json')
 
+const n = (n) => Number.parseInt(n)
+
 /**
  * Find program based on its NID
  */
 exports.findOne = function (req, res) {
   const nid = req.params.nid
-  const program = allPrograms.find((program) => program.nid === nid)
+  const program = searchablePrograms.find(
+    (program) => n(program.nid) === n(nid)
+  )
   if (program) {
     res.json(program)
   } else {
@@ -20,7 +24,7 @@ exports.findOne = function (req, res) {
  */
 exports.findArea = function (req, res) {
   const nid = req.params.nid
-  const area = programAreas.find((area) => area.nid === nid)
+  const area = programAreas.find((area) => n(area.nid) === n(nid))
   if (area) {
     res.json(area)
   } else {
