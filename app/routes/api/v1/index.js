@@ -20,6 +20,9 @@ router.get('/program/area/:nid', programs.findArea)
 // GET /api/v1/programs/searchable - Returns list of all searchable programs.
 router.get('/programs/searchable', programs.findSearchable)
 
+// GET /api/v1/programs/area/:nid - Returns area based on program NID.
+router.get('/program/area/:nid', programs.findAreaByProgram)
+
 // NESTED ROUTES
 router.use('/scrape', require('./scrape'))
 
