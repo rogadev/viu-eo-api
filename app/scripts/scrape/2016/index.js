@@ -1,7 +1,9 @@
 require('colors')
+
 const fs = require('fs')
 const path = require('path')
 const puppeteer = require('puppeteer')
+
 const { scrapeLinks } = require('./functions/scrape_links')
 const { scrapeData } = require('./functions/scrape_data')
 
