@@ -1,0 +1,80 @@
+[
+  {
+    "code": 10,
+    "name": "Newfoundland and Labrador",
+    "abbr": "N.L.",
+    "alpha": "NL"
+  },
+  {
+    "code": 11,
+    "name": "Prince Edward Island",
+    "abbr": "P.E.I.",
+    "alpha": "PE"
+  },
+  {
+    "code": 12,
+    "name": "Nova Scotia",
+    "abbr": "N.S.",
+    "alpha": "NS"
+  },
+  {
+    "code": 13,
+    "name": "New Brunswick",
+    "abbr": "N.B.",
+    "alpha": "NB"
+  },
+  {
+    "code": 24,
+    "name": "Quebec",
+    "abbr": "Que.",
+    "alpha": "QC"
+  },
+  {
+    "code": 35,
+    "name": "Ontario",
+    "abbr": "Ont.",
+    "alpha": "ON"
+  },
+  {
+    "code": 46,
+    "name": "Manitoba",
+    "abbr": "Man.",
+    "alpha": "MB"
+  },
+  {
+    "code": 47,
+    "name": "Saskatchewan",
+    "abbr": "Sask.",
+    "alpha": "SK"
+  },
+  {
+    "code": 48,
+    "name": "Alberta",
+    "abbr": "Alta.",
+    "alpha": "AB"
+  },
+  {
+    "code": 49,
+    "name": "British Columbia",
+    "abbr": "B.C.",
+    "alpha": "BC"
+  },
+  {
+    "code": 50,
+    "name": "Yukon",
+    "abbr": "Yukon",
+    "alpha": "YT"
+  },
+  {
+    "code": 51,
+    "name": "Northwest Territories",
+    "abbr": "NWT",
+    "alpha": "NT"
+  },
+  {
+    "code": 52,
+    "name": "Nunavut",
+    "abbr": "Nunavut",
+    "alpha": "NU"
+  }
+]
