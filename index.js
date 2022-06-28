@@ -3,19 +3,19 @@ const colors = require('colors')
 
 // EXPRESS APP
 const express = require('express')
-const app = express()
+const App = express()
 
-// ROUTER
-const routes = require('./app/routes')
+// MAIN ROUTER
+const MainRouter = require('./app/routes')
 
 // MIDDLEWARE
-app.use(express.json())
+App.use(express.json())
 
-// API V1 ROUTES
-app.use('/', routes)
+// MAIN ROUTES
+App.use('/', MainRouter)
 
 // START SERVER
-app.listen(3000, () => {
+App.listen(3000, () => {
   console.log('Server is', 'running'.green, 'on port', '3000'.green)
   console.log(
     'Follow link',
