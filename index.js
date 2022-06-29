@@ -1,5 +1,5 @@
 // LOG COLORIZER
-const colors = require('colors')
+require('colors')
 
 // EXPRESS APP
 const express = require('express')
