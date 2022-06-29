@@ -5,7 +5,7 @@ const programAreas = require('../data/viu/program_areas.json')
 const n = (n) => Number.parseInt(n)
 
 /**
- * Find program based on its NID
+ * Find program based on its NID. Searches only through searchable programs - these are programs which correspond to a host of job opportunities upon graduation, which are therefore searchable via LMI-EO API.
  */
 exports.findOne = function (req, res) {
   const nid = n(req.params.nid)
