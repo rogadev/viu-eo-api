@@ -1,3 +1,6 @@
+const fs = require('fs')
+const path = require('path')
+
 // ROUTER
 const router = require('express').Router()
 
@@ -12,8 +15,6 @@ router.put('/2021', scrape.noc2021) // TODO - add 2021 scrape controller logic
 
 // PUT /api/v1/scrape/2022 - Triggers reading noc unit group data and listing all valid NOC codes. Replaces existing files.
 router.put('/unit-groups', (req, res) => {
-  const fs = require('fs')
-  const path = require('path')
   const raw = require('../../../../data/noc/2016/noc_2016_unit_groups.json')
   const unitGroups = raw.reduce((codes, unitGroup) => {
     return [...codes, unitGroup.noc]
@@ -21,6 +22,28 @@ router.put('/unit-groups', (req, res) => {
   fs.writeFileSync(
     path.join(__dirname, '../../../../data/noc/2016/noc_2016_noc_codes.json'),
     JSON.stringify(unitGroups, null, 2)
+  )
+})
+
+router.get('/nid/programs', (req, res) => {
+  const raw = require('../../../../data/viu/all_programs.json')
+  const nids = raw.reduce((codes, program) => {
+    return [...codes, program.nid]
+  }, [])
+  fs.writeFileSync(
+    path.join(__dirname, '../../../../data/viu/all_program_nids.json'),
+    JSON.stringify(nids, null, 2)
+  )
+})
+
+router.get('/nid/areas', (req, res) => {
+  const raw = require('../../../../data/viu/program_areas.json')
+  const nids = raw.reduce((codes, area) => {
+    return [...codes, area.nid]
+  }, [])
+  fs.writeFileSync(
+    path.join(__dirname, '../../../../data/viu/all_area_nids.json'),
+    JSON.stringify(nids, null, 2)
   )
 })
 
