@@ -8,14 +8,16 @@ const n = (n) => Number.parseInt(n)
  * Find program based on its NID
  */
 exports.findOne = function (req, res) {
-  const nid = req.params.nid
-  const program = searchablePrograms.find(
-    (program) => n(program.nid) === n(nid)
-  )
+  const nid = n(req.params.nid)
+  const program = searchablePrograms.find((program) => program.nid === nid)
   if (program) {
     res.json(program)
   } else {
-    res.status(404).send('Not found')
+    res
+      .status(404)
+      .send(
+        'That program exists, but is not searchable by the VIU career outlooks API.'
+      )
   }
 }
 
