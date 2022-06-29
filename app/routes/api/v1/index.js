@@ -29,9 +29,25 @@ router.get('/program/area/:nid', programs.findAreaByProgram)
 
 // GET /api/v1/national/outlook/:noc - Returns area based on program NID.
 router.get(
-  '/national/outlook/:noc',
+  '/outlook/national/:noc',
   outlookMW.requiresNocParam,
   outlooks.nationalOutlook
+)
+
+// GET /api/v1/provincial/outlook/
+router.get(
+  '/outlook/provincial/:noc',
+  outlookMW.requiresNocParam,
+  outlookMW.requiresProvinceQuery,
+  outlooks.provincialOutlook
+)
+
+// GET /api/v1/regional/outlook/
+router.get(
+  '/outlook/regional/:noc',
+  outlookMW.requiresNocParam,
+  outlookMW.requiresRegionQuery,
+  outlooks.regionalOutlook
 )
 
 // NESTED ROUTES
