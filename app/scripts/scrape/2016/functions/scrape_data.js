@@ -3,25 +3,31 @@ const path = require('path')
 require('colors')
 
 exports.scrapeData = async (browser, links) => {
+  // LOG PROGRESS
   console.log('Loaded.'.green)
   console.log('Attempting to scrape data...'.magenta)
+  // OPEN BROWSER, EXTEND DEFAULT TIMEOUT
   const page = await browser.newPage()
   await page.setDefaultNavigationTimeout(10000)
+  // INITIATE COLLECTION
   const collection = []
+  // NAVIGATE THROUGH EACH LINK
   for (const link of links) {
+    // LOG PROGRESS
     console.log(`Scraping ${link}...`.magenta)
+    // NAVIGATE TO PAGE
     await page.goto(link)
-
-    const results = await page.$eval(
+    // SCRAPE NOC CODE & UNIT GROUP TITLE
+    const codeAndTitle = await page.$eval(
       'body > main > div.panel.panel-default.mrgn-tp-0.mrgn-bttm-md > div > h2',
       (el) => el.innerText
     )
-    // Result 1 - NOC Number and Unit Group Title
-    const noc = results.substring(0, 5).trim()
-    const title = results.substring(6).trim()
+    const noc = codeAndTitle.substring(0, 5).trim()
+    const title = codeAndTitle.substring(6).trim()
+    // LOG PROGRESS
     console.log(noc, title)
 
-    // Result 2 - List of sections
+    // SCRAPE SECTIONS DATA
     const sections = await page.evaluate(() => {
       const sectionNodes = []
       document
@@ -53,7 +59,7 @@ exports.scrapeData = async (browser, links) => {
           }
           sections.push({
             title: sectionNode.querySelector('p > strong').innerText,
-            subSections: subSections,
+            items: subSections,
           })
         } else {
           const items = []
@@ -62,13 +68,17 @@ exports.scrapeData = async (browser, links) => {
             .forEach((el) => items.push(el.innerText))
           sections.push({
             title: sectionNode.querySelector('p > strong').innerText,
-            items,
+            items: items,
           })
         }
       }
       return sections
     })
-    collection.push(sections)
+    collection.push({
+      noc: noc,
+      title: title,
+      sections: sections,
+    })
   }
 
   fs.writeFile(
