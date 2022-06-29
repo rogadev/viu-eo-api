@@ -10,10 +10,12 @@ const MainRouter = require('./app/routes')
 
 // MIDDLEWARE
 App.use(express.json())
-App.use(require('./app/middleware/error.middleware.js')) // ERROR HANDLER
 
 // MAIN ROUTES
 App.use('/', MainRouter)
+
+// ERROR HANDLING MIDDLEWARE
+App.use(require('./app/middleware/error.middleware.js')) // must come after other app.use statements and routes
 
 // START SERVER
 App.listen(3000, () => {
