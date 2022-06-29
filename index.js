@@ -10,6 +10,7 @@ const MainRouter = require('./app/routes')
 
 // MIDDLEWARE
 App.use(express.json())
+App.use(require('./app/middleware/error.middleware.js')) // ERROR HANDLER
 
 // MAIN ROUTES
 App.use('/', MainRouter)
