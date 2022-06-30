@@ -49,6 +49,12 @@ router.get(
   jobs.jobsByProgram
 )
 
+router.get(
+  '/jobs/credential',
+  jobsMW.requiresCredentialQuery,
+  jobs.jobsByCredential
+)
+
 // NESTED ROUTES
 router.use('/scrape', require('./scrape'))
 router.use('/outlook', require('./outlook'))
