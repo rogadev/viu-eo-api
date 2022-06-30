@@ -18,6 +18,7 @@ exports.jobsByCredential = function (req, res) {
     credential: [...ensureArray(req.query.credential)],
     search: [...ensureArray(req.query.keywords)],
   }
+  console.log('🚀 ~ file: jobs.controller.js ~ line 21 ~ keywords', keywords)
 
   res.send(keywords)
 }
@@ -42,7 +43,9 @@ exports.jobsByProgram = function (req, res) {
   // TODO - Finish implementation
 
   if (nocKeywords) {
-    // Search keywords
+    // Build credential keywords
+    // Extract search keywords
+    // TODO - waiting on answer to question about how to handle hitting multiple routes (maybe requires Axios)
     // Push results to results array
   }
   if (knownGroups) {
@@ -50,5 +53,22 @@ exports.jobsByProgram = function (req, res) {
     // Push results to results array
   }
 
+  // Reduce results for duplicates
+
   res.send(program)
+}
+
+exports.test = function (req, res) {
+  const search = require('../helpers/search.helper.js')
+
+  // DUMMY DATA
+  // TODO - left off trying to get dummy data to return results.
+  const keywords = {
+    credential: ['college'],
+    search: ['computer science'],
+  }
+
+  const results = search(keywords)
+
+  res.send(results)
 }
