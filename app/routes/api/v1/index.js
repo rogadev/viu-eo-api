@@ -3,10 +3,12 @@ const router = require('express').Router()
 
 // MIDDLEWARE
 const programMW = require('../../../middleware/program.middleware.js')
+const jobsMW = require('../../../middleware/jobs.middleware.js')
 
 // CONTROLLERS
 const test = require('../../../controllers/test.controller.js')
 const programs = require('../../../controllers/program.controller.js')
+const jobs = require('../../../controllers/jobs.controller.js')
 
 // GET /api/v1/test - Test route.
 router.get('/test', test.test)
@@ -40,10 +42,16 @@ router.get('/programs/all', programs.findAll)
 // GET /api/v1/programs/searchable - Returns list of all searchable programs.
 router.get('/programs/searchable', programs.findSearchable)
 
-router.use('/outlook', require('./outlook'))
+// GET /api/v1/jobs/program/:nid - Returns list of all searchable programs.
+router.get(
+  '/jobs/program/:nid',
+  jobsMW.requiresProgramNidParam,
+  jobs.jobsByProgram
+)
 
 // NESTED ROUTES
 router.use('/scrape', require('./scrape'))
+router.use('/outlook', require('./outlook'))
 
 // EXPORT
 module.exports = router
