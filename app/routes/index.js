@@ -9,7 +9,7 @@ const test = require('../../app/controllers/test.controller.js')
 
 // ROUTER MIDDLEWARE
 router.use((req, res, next) => {
-  console.log('Request received:', req.method.green, req.url.blue)
+  console.log('Request:', req.method.green, req.url.blue)
   next()
 })
 
