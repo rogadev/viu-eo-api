@@ -20,10 +20,22 @@ exports.requiresProgramNidParam = function (req, res, next) {
   if (!Number.isInteger(Number.parseInt(req.params.nid))) {
     return res.status(400).send('Invalid nid parameter (format)')
   }
-  const programs = require('../data/viu/all_program_nids.json')
+  const programs = require('../data/viu/all_programs.json')
   const validNids = programs.map((program) => program.nid)
   if (!validNids.includes(req.params.nid)) {
     return res.status(400).send('Invalid nid parameter (value)')
+  } else {
+    const searchablePrograms = require('../data/viu/searchable_programs.json')
+    const searchableNids = searchablePrograms.map((program) =>
+      program.nid.toString()
+    )
+    if (!searchableNids.includes(req.params.nid)) {
+      return res
+        .status(400)
+        .send(
+          'This program exists but renders no results when searching for related NOC unit groups.'
+        )
+    }
   }
   next()
 }
