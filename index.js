@@ -1,4 +1,5 @@
-// LOG COLORIZER
+// HELPER PACKAGES
+require('dotenv').config()
 require('colors')
 
 // EXPRESS APP
