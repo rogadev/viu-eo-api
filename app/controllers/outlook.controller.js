@@ -1,3 +1,10 @@
+// PACKAGES
+const NodeCache = require('node-cache')
+const nationalOutlooksCache = new NodeCache({ stdTTL: 2_592_000_000 }) // Standard time-to-live = 1 month
+const provincialOutlooksCache = new NodeCache({ stdTTL: 2_592_000_000 }) // Standard time-to-live = 1 month
+const regionalOutlooksCache = new NodeCache({ stdTTL: 2_592_000_000 }) // Standard time-to-live = 1 month
+
+// FETCH HEADER - API KEY
 const headers = new Headers()
 headers.append('USER_KEY', process.env.USER_KEY)
 
@@ -51,12 +58,19 @@ const fetchRegionalOutlook = async (noc, regionId) => {
 exports.nationalOutlook = async function (req, res) {
   const noc = req.params.noc
   try {
-    const apiResponse = await fetchNationalOutlook(noc)
-    const result = await apiResponse.json()
-    res.send(result)
+    let outlook = nationalOutlooksCache.get(noc)
+    if (!outlook) {
+      const apiResponse = await fetchNationalOutlook(noc)
+      outlook = await apiResponse.json()
+      nationalOutlooksCache.set(noc, outlook)
+      // console.log(`Cached national outlook for ${noc}`)
+    } else {
+      // console.log(`Using cached national outlook for ${noc}`)
+    }
+    res.send(outlook)
   } catch (e) {
     console.error(e)
-    res.status(e.status ? e.status : 500).send(e)
+    res.status(e.status ?? 500).send(e)
   }
 }
 
@@ -71,12 +85,19 @@ exports.provincialOutlook = async function (req, res) {
   const noc = req.params.noc
   const prov = req.query.province
   try {
-    const apiResponse = await fetchProvincialOutlook(noc, prov)
-    const result = await apiResponse.json()
-    res.send(result)
+    let outlook = provincialOutlooksCache.get(`${noc}-${prov}`)
+    if (!outlook) {
+      const apiResponse = await fetchProvincialOutlook(noc, prov)
+      outlook = await apiResponse.json()
+      provincialOutlooksCache.set(`${noc}-${prov}`, outlook)
+      // console.log(`Cached provincial outlook for ${noc}-${prov}`)
+    } else {
+      // console.log(`Using cached provincial outlook for ${noc}-${prov}`)
+    }
+    res.send(outlook)
   } catch (e) {
     console.error(e)
-    res.status(e.status ? e.status : 500).send(e)
+    res.status(e.status ?? 500).send(e)
   }
 }
 
@@ -91,11 +112,18 @@ exports.regionalOutlook = async function (req, res) {
   const noc = req.params.noc
   const rgn = req.query.region
   try {
-    const apiResponse = await fetchRegionalOutlook(noc, rgn)
-    const result = await apiResponse.json()
-    res.send(result)
+    let outlook = regionalOutlooksCache.get(`${noc}-${rgn}`)
+    if (!outlook) {
+      const apiResponse = await fetchRegionalOutlook(noc, rgn)
+      outlook = await apiResponse.json()
+      regionalOutlooksCache.set(`${noc}-${rgn}`, outlook)
+      // console.log(`Cached regional outlook for ${noc}-${rgn}`)
+    } else {
+      // console.log(`Using cached regional outlook for ${noc}-${rgn}`)
+    }
+    res.send(outlook)
   } catch (e) {
     console.error(e)
-    res.status(e.status ? e.status : 500).send(e)
+    res.status(e.status ?? 500).send(e)
   }
 }
