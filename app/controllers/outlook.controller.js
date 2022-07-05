@@ -1,8 +1,9 @@
-// PACKAGES
+// CACHES
 const NodeCache = require('node-cache')
-const nationalOutlooksCache = new NodeCache({ stdTTL: 2_592_000_000 }) // Standard time-to-live = 1 month
-const provincialOutlooksCache = new NodeCache({ stdTTL: 2_592_000_000 }) // Standard time-to-live = 1 month
-const regionalOutlooksCache = new NodeCache({ stdTTL: 2_592_000_000 }) // Standard time-to-live = 1 month
+const ttl = 60 * 60 * 24 * 30 * 3 // 3 month time to live
+const nationalOutlooksCache = new NodeCache({ stdTTL: ttl })
+const provincialOutlooksCache = new NodeCache({ stdTTL: ttl })
+const regionalOutlooksCache = new NodeCache({ stdTTL: ttl })
 
 // FETCH HEADER - API KEY
 const headers = new Headers()
@@ -11,7 +12,7 @@ headers.append('USER_KEY', process.env.USER_KEY)
 /**
  * Uses the LMI Employment Outlook API to query for the national outlook for a given NOC unit group code. LMI-EO uses NOC 2016 v1.3.
  * @param {String} noc The NOC code of the relevant unit group.
- * @returns Array of outlook objects containing provincial code and "ootential" metric. Potential describes outlook as a number from 0-3, 3 being best.
+ * @returns Array of outlook objects containing provincial code and "potential" metric. Potential describes outlook as a number from 0-3, 3 being best.
  */
 const fetchNationalOutlook = async (noc) => {
   // example query: GET https://lmi-outlooks-esdc-edsc-apicast-production.api.canada.ca/clmix-wsx/gcapis/outlooks/ca?noc=1111
@@ -51,6 +52,7 @@ const fetchRegionalOutlook = async (noc, regionId) => {
 
 /**
  * Used to query the LMI Employment Outlook API for nation-wide outlooks for a given NOC unit group code. LMI-EO uses NOC 2016 v1.3.
+ * Caches data for up to 1 month. Uses cache for faster response times and reduced API calls.
  * Middleware should catch most bad requests before they hit the API.
  * @param noc The NOC code of the relevant unit group.
  * @returns The national outlook data for the given unit group.
@@ -76,6 +78,7 @@ exports.nationalOutlook = async function (req, res) {
 
 /**
  * Used to query the LMI Employment Outlook API for provincial outlooks for a given NOC unit group code. LMI-EO uses NOC 2016 v1.3.
+ * Caches data for up to 1 month. Uses cache for faster response times and reduced API calls.
  * Middleware should catch most bad requests before they hit the API.
  * @param noc  The NOC code of the relevant unit group.
  * @query province The province code of the relevant unit group.
@@ -103,6 +106,7 @@ exports.provincialOutlook = async function (req, res) {
 
 /**
  * Used to query the LMI Employment Outlook API for regional outlooks for a given NOC unit group code. LMI-EO uses NOC 2016 v1.3.
+ * Caches data for up to 1 month. Uses cache for faster response times and reduced API calls.
  * Middleware should catch most bad requests before they hit the API.
  * @param noc  The NOC code of the relevant unit group.
  * @query province The province code of the relevant unit group.

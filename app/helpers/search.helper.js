@@ -14,6 +14,39 @@ const pushIfUnique = (arr, item) => {
   }
 }
 
+const expandCredentials = (credentials) => {
+  const result = []
+  for (let cred of credentials) {
+    cred = cred.toLowerCase().trim()
+
+    if (cred.includes('degree')) {
+      result.push(
+        'degree',
+        'university program',
+        'university or college',
+        "bachelor's",
+        "master's",
+        'doctoral'
+      )
+    }
+    if (cred.includes('certificate')) {
+      result.push(
+        'certificate',
+        'school programs',
+        'school program',
+        'apprenticeship',
+        'red seal',
+        'trades program',
+        'trades school'
+      )
+    }
+    if (cred.includes('diploma')) {
+      result.push('diploma', 'college program', 'college or other program')
+    }
+  }
+  return result
+}
+
 /**
  * Using credential and search keywords, searches for matching NOC unit groups, based on requirements, and returns the results.
  * @param {Object} keywords - An object containing credential keywords and search keywords.
@@ -21,20 +54,32 @@ const pushIfUnique = (arr, item) => {
  */
 module.exports = (keywordObject) => {
   const unitGroups = require('../data/noc/2016/noc_2016_unit_groups.json')
-  const { credential, search } = keywordObject
-  const combinations = keywordCombinator(credential, search)
+  const { credential, search: searchTerms } = keywordObject
+  const expandedCredentialTermsArray = expandCredentials(credential)
+  const keywordCombinationsArray = keywordCombinator(
+    expandedCredentialTermsArray,
+    searchTerms
+  )
+
+  // Collector
   const groupResults = []
 
-  for (const keywords in combinations) {
-    const result = unitGroups.find((group) => {
-      const reqSection = group.sections.find(
-        (section) => section.title === 'Employment requirements'
+  for (const keywordCombo of keywordCombinationsArray) {
+    // One keyword combo will be a combination of credential and search terms (e.g. ['degree', 'programming'])
+    for (const group of unitGroups) {
+      // Break out each group's requirement's into an array
+      const groupRequirements = group.sections.find((section) =>
+        section.title.includes('Employment requirements')
       )
-      const requirements = reqSection.items
-      return requirements.includes(keywords)
-    })
-    if (result) {
-      pushIfUnique(groupResults, result)
+      const requirements = groupRequirements.items
+      const fixed = requirements.reduce((items, item) => {
+        return [...items, ('' + item).replace(/[\r\n]/gm, '').trim()]
+      }, [])
+      for (const item of fixed) {
+        if (keywordCombo.every((keyword) => item.includes(keyword))) {
+          pushIfUnique(groupResults, group)
+        }
+      }
     }
   }
 

@@ -55,8 +55,6 @@ router.get(
   jobs.jobsByCredential
 )
 
-router.get('/jobs/test', jobs.test)
-
 // NESTED ROUTES
 router.use('/scrape', require('./scrape'))
 router.use('/outlook', require('./outlook'))

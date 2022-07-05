@@ -9,6 +9,8 @@ const ensureArray = (input) => {
   }
 }
 
+const search = require('../helpers/search.helper.js')
+
 /**
  * Receives credential keywords and search keywords, uses them to find NOC unit groups that match the keywords/requirements.
  * @returns An object containing jobs and groups, relevant to the given search.
@@ -18,9 +20,10 @@ exports.jobsByCredential = function (req, res) {
     credential: [...ensureArray(req.query.credential)],
     search: [...ensureArray(req.query.keywords)],
   }
-  console.log('🚀 ~ file: jobs.controller.js ~ line 21 ~ keywords', keywords)
 
-  res.send(keywords)
+  const result = search(keywords)
+
+  res.send(result)
 }
 
 /**
@@ -56,19 +59,4 @@ exports.jobsByProgram = function (req, res) {
   // Reduce results for duplicates
 
   res.send(program)
-}
-
-exports.test = function (req, res) {
-  const search = require('../helpers/search.helper.js')
-
-  // DUMMY DATA
-  // TODO - left off trying to get dummy data to return results.
-  const keywords = {
-    credential: ['college'],
-    search: ['computer science'],
-  }
-
-  const results = search(keywords)
-
-  res.send(results)
 }
