@@ -9,6 +9,12 @@ const ensureArray = (input) => {
   }
 }
 
+const pushIfUnique = (arr, item) => {
+  if (!arr.includes(item)) {
+    arr.push(item)
+  }
+}
+
 const search = require('../helpers/search.helper.js')
 
 /**
@@ -41,22 +47,34 @@ exports.jobsByProgram = function (req, res) {
     : null
   const knownGroups = program.known_noc_groups ? program.known_noc_groups : null
 
-  const results = []
-
-  // TODO - Finish implementation
+  const jobResults = []
+  const groupResults = []
 
   if (nocKeywords) {
-    // Build credential keywords
-    // Extract search keywords
-    // TODO - waiting on answer to question about how to handle hitting multiple routes (maybe requires Axios)
-    // Push results to results array
+    const credential = program.credential
+    const keywords = {
+      credential: [...ensureArray(credential)],
+      search: [...ensureArray(nocKeywords)],
+    }
+    const results = search(keywords)
+    results.jobs.forEach((result) => pushIfUnique(jobResults, result))
+    results.groups.forEach((result) => pushIfUnique(groupResults, result))
   }
   if (knownGroups) {
-    // Retrieve results from known groups
-    // Push results to results array
+    knownGroups.forEach((noc) => {
+      const groupResult = unitGroups.find(
+        (noc) => noc === uGroup.noc.toString()
+      )
+      if (groupResult) {
+        pushIfUnique(groupResults, groupResult)
+      }
+    })
   }
 
-  // Reduce results for duplicates
+  const results = {
+    jobs: jobResults,
+    groups: groupResults,
+  }
 
-  res.send(program)
+  res.send(results)
 }
