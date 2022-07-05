@@ -1,3 +1,6 @@
+/**
+ * Error middleware - catch-all for uncaught errors.
+ */
 module.exports = (error, req, res, next) => {
   console.log('Error Handling Middleware called')
   console.log('Path: ', req.path)

@@ -1,5 +1,7 @@
 /**
  * Checks for 'credential' and 'keywords' query params. If either is missing, returns 400.
+ * @query {Array<String>} credential - Credential keywords to search for.
+ * @query {Array<String>} keywords - Keywords to search for. Related to field or area.
  */
 exports.requiresCredentialQuery = function (req, res, next) {
   const credential = req.query.credential
@@ -12,6 +14,7 @@ exports.requiresCredentialQuery = function (req, res, next) {
 
 /**
  * Checks for NID in params. If missing, returns 400.
+ * @param {String} nid - NID to verify.
  */
 exports.requiresProgramNidParam = function (req, res, next) {
   if (!req.params.nid) {

@@ -1,3 +1,12 @@
+// HELPERS
+const { pushIfUnique } = require('./array.helpers.js')
+
+/**
+ * Creates every possible combination of the keywords in each array. Used for searching through NOC unit groups, specifically the "requirements" section.
+ * @param {Array} arr1 - An array of strings
+ * @param {Array} arr2 - An array of strings
+ * @returns {Array} - An array of arrays of strings, each array containing a combination of strings from arr1 and arr2.
+ */
 const keywordCombinator = (arr1, arr2) => {
   const results = []
   for (const item1 of arr1) {
@@ -8,12 +17,11 @@ const keywordCombinator = (arr1, arr2) => {
   return results
 }
 
-const pushIfUnique = (arr, item) => {
-  if (!arr.includes(item)) {
-    arr.push(item)
-  }
-}
-
+/**
+ * When searching NOC requirements fields, the credential terms require expanding to include more than just one word, as the fields beign searched are not standardized.
+ * @param {Array<String>} credentials - Credential keyword(s) to expand.  e.g. ['degree', 'certificate', 'diploma']
+ * @returns {Array<String>} - Expanded credential keyword(s) e.g. ['degree', 'certificate', 'diploma', 'degree certificate', 'degree diploma', 'certificate diploma']
+ */
 const expandCredentials = (credentials) => {
   const result = []
   for (let cred of credentials) {
@@ -86,6 +94,7 @@ module.exports = (keywordObject) => {
     }
   }
 
+  // Collector
   const results = {
     jobs: [],
     groups: [],
