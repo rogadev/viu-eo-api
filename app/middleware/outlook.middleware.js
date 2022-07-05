@@ -17,13 +17,6 @@ exports.requiresNocParam = function (req, res, next) {
   next()
 }
 
-exports.requiresRegionQuery = function (req, res, next) {
-  if (!req.query.region) {
-    res.status(400).send('Missing required parameters (region)')
-  }
-  next()
-}
-
 exports.requiresProvinceQuery = function (req, res, next) {
   if (!req.query.province) {
     res.status(400).send('Missing required parameters (province)')
