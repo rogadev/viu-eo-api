@@ -1,34 +1,27 @@
+// DATA
 const unitGroups = require('../data/noc/2016/noc_2016_unit_groups.json')
+const programs = require('../data/viu/searchable_programs.json') // NOTE: Only using searchable programs. Not all programs will return results.
 
-const ensureArray = (input) => {
-  if (Array.isArray(input)) {
-    return input
-  } else {
-    let arr = input.split(',')
-    return arr.map((item) => item.trim())
-  }
-}
-
-const pushIfUnique = (arr, item) => {
-  if (!arr.includes(item)) {
-    arr.push(item)
-  }
-}
-
+// HELPERS
 const search = require('../helpers/search.helper.js')
+const { pushIfUnique, ensureArray } = require('../helpers/array.helpers.js')
+const extractJobs = require('../helpers/extract_jobs.helper.js')
+
+// ---------------------------------------------------------------------------------------------------------------------
+// -------------------------------------------- CONTROLLER FUNCTIONS ---------------------------------------------------
+// ---------------------------------------------------------------------------------------------------------------------
 
 /**
  * Receives credential keywords and search keywords, uses them to find NOC unit groups that match the keywords/requirements.
  * @returns An object containing jobs and groups, relevant to the given search.
  */
 exports.jobsByCredential = function (req, res) {
+  // Required keywords format for search() helper function
   const keywords = {
     credential: [...ensureArray(req.query.credential)],
     search: [...ensureArray(req.query.keywords)],
   }
-
   const result = search(keywords)
-
   res.send(result)
 }
 
@@ -38,18 +31,22 @@ exports.jobsByCredential = function (req, res) {
  * @returns An object containing jobs and groups, relevant to the given search.
  */
 exports.jobsByProgram = function (req, res) {
-  const programs = require('../data/viu/searchable_programs.json')
+  // Find the program using it's NID
   const program = programs.find(
     (program) => program.nid.toString() === req.params.nid
   )
+  // Extract NOC searchable keywords (searched using the search() helper function)
   const nocKeywords = program.noc_search_keywords
     ? program.noc_search_keywords
     : null
+  // Extract all known NOC unit groups - this is an array of NOC unit group numbers as strings.
   const knownGroups = program.known_noc_groups ? program.known_noc_groups : null
 
+  // Collector Arrays
   const jobResults = []
   const groupResults = []
 
+  // Only attempt to search if we have keywords to search with
   if (nocKeywords) {
     const credential = program.credential
     const keywords = {
@@ -60,13 +57,19 @@ exports.jobsByProgram = function (req, res) {
     results.jobs.forEach((result) => pushIfUnique(jobResults, result))
     results.groups.forEach((result) => pushIfUnique(groupResults, result))
   }
+
+  // Only add known unit groups if the program we're referencing has any
   if (knownGroups) {
-    knownGroups.forEach((noc) => {
+    knownGroups.forEach((nocString) => {
+      // Search for a matching unit group using the NOC unit group number
       const groupResult = unitGroups.find(
-        (noc) => noc === uGroup.noc.toString()
+        (uGroup) => nocString === uGroup.noc.toString()
       )
+      // It's possible that there are no group results due to a bad data, or a breaking change, so we'll check for that.
       if (groupResult) {
         pushIfUnique(groupResults, groupResult)
+        const jobs = extractJobs([groupResult.noc])
+        jobs.forEach((job) => pushIfUnique(jobResults, job))
       }
     })
   }
