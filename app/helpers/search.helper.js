@@ -64,19 +64,22 @@ module.exports = (keywordObject) => {
   // Collector
   const groupResults = []
 
-  for (const keywordCombo of keywordCombinationsArray) {
-    // One keyword combo will be a combination of credential and search terms (e.g. ['degree', 'programming'])
-    for (const group of unitGroups) {
+  for (const group of unitGroups) {
+    for (const keywordCombo of keywordCombinationsArray) {
+      // One keyword combo will be a combination of credential and search terms (e.g. ['degree', 'programming'])
+
       // Break out each group's requirement's into an array
       const groupRequirements = group.sections.find((section) =>
         section.title.includes('Employment requirements')
       )
-      const requirements = groupRequirements.items
-      const fixed = requirements.reduce((items, item) => {
+      const rawRequirements = groupRequirements.items
+      // There is an issue with requirements - formatting did not remove + signs or \n characters. This breaks array functions.
+      const requirements = rawRequirements.reduce((items, item) => {
         return [...items, ('' + item).replace(/[\r\n]/gm, '').trim()]
       }, [])
-      for (const item of fixed) {
-        if (keywordCombo.every((keyword) => item.includes(keyword))) {
+      // For every requirement, check if it matches the keyword combo
+      for (const requirement of requirements) {
+        if (keywordCombo.every((keyword) => requirement.includes(keyword))) {
           pushIfUnique(groupResults, group)
         }
       }
@@ -94,18 +97,20 @@ module.exports = (keywordObject) => {
     return results
   }
 
+  const jobs = []
+
   for (const group of groupResults) {
     pushIfUnique(results.groups, group)
-    const jobsSection = group.sections.find(
-      (section) => section.title === 'Illustrative example(s)'
+    const jobSection = group.sections.find((section) =>
+      section.title.includes('Illustrative example(s)')
     )
-    const jobs = jobsSection.map((section) => section.items)
-    for (const job of jobs) {
-      pushIfUnique(results.jobs, job)
-    }
+    jobs.push({
+      noc: group.noc,
+      jobs: jobSection.items,
+    })
   }
 
-  console.log('🚀 ~ file: search.helper.js ~ line 53 ~ results', results)
+  results.jobs = jobs
 
   return results
 }
