@@ -7,9 +7,7 @@ const search = require('../helpers/search.helper.js')
 const { pushIfUnique, ensureArray } = require('../helpers/array.helpers.js')
 const extractJobs = require('../helpers/extract_jobs.helper.js')
 
-// ---------------------------------------------------------------------------------------------------------------------
-// -------------------------------------------- CONTROLLER FUNCTIONS ---------------------------------------------------
-// ---------------------------------------------------------------------------------------------------------------------
+// CONTROLLER FUNCTIONS
 
 /**
  * Receives credential keywords and search keywords, uses them to find NOC unit groups that match the keywords/requirements.
@@ -74,10 +72,10 @@ exports.jobsByProgram = function (req, res) {
     })
   }
 
+  // Form response and send.
   const results = {
     jobs: jobResults,
     groups: groupResults,
   }
-
   res.send(results)
 }

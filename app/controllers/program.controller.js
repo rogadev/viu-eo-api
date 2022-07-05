@@ -1,14 +1,22 @@
+// DATA
 const allPrograms = require('../data/viu/program_areas.json')
 const searchablePrograms = require('../data/viu/searchable_programs.json')
 const programAreas = require('../data/viu/program_areas.json')
 
-const n = (n) => Number.parseInt(n)
+// LOCAL FUNCTIONS
+/**
+ * Turn the string you pass in into a number, provided it contains a valid int.
+ * @param {String} n - The item to numberify
+ * @returns {Number} - The numberified number
+ */
+const numberify = (n) => Number.parseInt(n)
 
+// CONTROLLER FUNCTIONS
 /**
  * Find program based on its NID. Searches only through searchable programs - these are programs which correspond to a host of job opportunities upon graduation, which are therefore searchable via LMI-EO API.
  */
 exports.findOne = function (req, res) {
-  const nid = n(req.params.nid)
+  const nid = numberify(req.params.nid)
   const program = searchablePrograms.find((program) => program.nid === nid)
   if (program) {
     res.json(program)
@@ -26,7 +34,9 @@ exports.findOne = function (req, res) {
  */
 exports.findArea = function (req, res) {
   const nid = req.params.nid
-  const area = programAreas.find((area) => n(area.nid) === n(nid))
+  const area = programAreas.find(
+    (area) => numberify(area.nid) === numberify(nid)
+  )
   if (area) {
     res.json(area)
   } else {
@@ -53,7 +63,9 @@ exports.findAll = function (req, res) {
  */
 exports.findAreaByProgram = function (req, res) {
   const programNid = req.params.nid
-  const area = programAreas.find((area) => n(area.nid) === n(programNid))
+  const area = programAreas.find(
+    (area) => numberify(area.nid) === numberify(programNid)
+  )
   if (area) {
     res.json(area)
   } else {

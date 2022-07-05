@@ -7,7 +7,7 @@ const puppeteer = require('puppeteer')
 const { scrapeLinks } = require('./functions/scrape_links')
 const { scrapeData } = require('./functions/scrape_data')
 
-exports.scrape = async () => {
+module.exports = async () => {
   const browser = await puppeteer.launch()
   // check if noc_2016_unit_group_links.json exists
   let links = []

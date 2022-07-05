@@ -3,7 +3,7 @@ const colors = require('colors')
 const puppeteer = require('puppeteer')
 const fs = require('fs/promises')
 
-async function run() {
+module.exports = async () => {
   const browser = await puppeteer.launch()
   const page = await browser.newPage()
 
@@ -98,5 +98,3 @@ async function run() {
 
   browser.close()
 }
-
-run()

@@ -1,5 +1,6 @@
 // SCRAPE SCRIPT
-const { scrape } = require('../scripts/scrape/2016/index')
+const scrape2016 = require('../scripts/scrape/2016')
+const scrape2021 = require('../scripts/scrape/2021')
 
 /**
  * NOC 2016 v1.3 Scrape Controller
@@ -7,7 +8,7 @@ const { scrape } = require('../scripts/scrape/2016/index')
  * Responds with a success message, sent ahead of async scrape.
  */
 exports.noc2016 = (req, res) => {
-  scrape()
+  scrape2016()
   res.send(
     'Scrape has begun. This process may take time. If successful, the data will update in about 15-20 minutes.'
   )
@@ -20,5 +21,8 @@ exports.noc2016 = (req, res) => {
  * NOTE: This route is not yet implemented. (June 28, 2022)
  */
 exports.noc2021 = (req, res) => {
-  res.send('Scrape for 2021 has not yet been implemented.')
+  scrape2021()
+  res.send(
+    'Scrape has begun. This process may take time. If successful, the data will update in about 15-20 minutes.'
+  )
 }
