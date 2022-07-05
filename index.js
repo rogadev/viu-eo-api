@@ -12,6 +12,9 @@ const MainRouter = require('./app/routes')
 // MIDDLEWARE
 App.use(express.json())
 
+// FALLBACK ROUTE
+App.get('/', (req, res) => res.send('Hello.'))
+
 // MAIN ROUTES
 App.use('/', MainRouter)
 
@@ -19,7 +22,7 @@ App.use('/', MainRouter)
 App.use(require('./app/middleware/error.middleware.js')) // must come after other app.use statements and routes
 
 // START SERVER
-App.listen(3000, () => {
+App.listen(process.env.PORT, () => {
   console.log('Server is', 'running'.green, 'on port', '3000'.green)
   console.log(
     'Follow link',
