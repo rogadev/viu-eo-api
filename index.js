@@ -30,4 +30,9 @@ App.listen(process.env.PORT, () => {
     '->'.magenta,
     'http://localhost:3000/api/v1/test'.blue
   )
+  console.log(
+    'Deployed link',
+    '->'.magenta,
+    'https://viu-career-outlook.herokuapp.com/api/v1/test'.blue
+  )
 })

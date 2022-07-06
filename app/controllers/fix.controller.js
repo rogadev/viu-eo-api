@@ -49,4 +49,5 @@ exports.fixData = (req, res) => {
     path.join(__dirname, '../data/noc/2016/new_noc_2016_unit_groups.json'),
     JSON.stringify(collector, null, 2)
   )
+  res.send('Done')
 }
