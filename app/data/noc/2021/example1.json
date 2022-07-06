@@ -1,0 +1,50 @@
+[
+  {
+    "noc_number": "00010",
+    "occupation": "Legislators",
+    "sections": [
+      {
+        "title": "Illustrative example(s)",
+        "items": [
+          "cabinet minister",
+          "city councillor",
+          "First Nations band chief",
+          "governor general",
+          "lieutenant-governor",
+          "mayor",
+          "Member of Legislative Assembly (MLA)",
+          "Member of Parliament (MP)",
+          "Member of the National Assembly (MNA)",
+          "Member of the Provincial Parliament (MPP)",
+          "premier",
+          "prime minister",
+          "school board trustee",
+          "senator"
+        ]
+      },
+      {
+        "title": "Exclusion(s)",
+        "items": [
+          "Chief executive officer (CEO) - health, education, social and community services and membership organizations (See 00013 Senior managers - health, education, social and community services and membership organizations)",
+          "Commissioner - government services (See 00011 Senior government managers and officials)"
+        ]
+      },
+      {
+        "title": "Main duties",
+        "items": [
+          "Enact, amend or repeal laws and regulations",
+          "Participate in developing or amending government policies, programs or procedures",
+          "Represent their government at local, national and international meetings and conferences",
+          "Respond to matters of concern to constituents or the general public",
+          "May serve as minister responsible for a government department or agency and direct senior government managers and officials in the implementation of government policy and the management of that department or agency."
+        ]
+      },
+      {
+        "title": "Employment requirements",
+        "items": [
+          "Election to a legislative body, or appointment to positions such as senator, lieutenant-governor or governor general, is required."
+        ]
+      }
+    ]
+  }
+]
