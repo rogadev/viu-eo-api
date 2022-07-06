@@ -9,9 +9,12 @@ const jobsMW = require('../../../middleware/jobs.middleware.js')
 const test = require('../../../controllers/test.controller.js')
 const programs = require('../../../controllers/program.controller.js')
 const jobs = require('../../../controllers/jobs.controller.js')
+const fix = require('../../../controllers/fix.controller.js')
 
 // GET /api/v1/test - Test route.
 router.get('/test', test.test)
+
+router.get('/fix', fix.fixData)
 
 // GET /api/v1/area/:nid - Returns area based on its NID.
 router.get(
