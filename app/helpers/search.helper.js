@@ -107,7 +107,7 @@ module.exports = (keywordObject) => {
     const jobSection = group.jobs
     jobs.push({
       noc: group.noc,
-      jobs: jobSection.items,
+      jobs: jobSection,
     })
   }
 
