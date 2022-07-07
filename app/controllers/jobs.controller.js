@@ -77,6 +77,7 @@ exports.jobsByProgram = function (req, res) {
     jobs: jobResults,
     groups: groupResults,
   }
+  // TODO - Remove the groups from this response. Send only jobs as array of objects.
   res.send(results)
 }
 
@@ -94,3 +95,5 @@ exports.getJobs = (req, res) => {
   res.status(500).send('Something went wrong')
 }
 // TODO - imlement in a route.
+
+// TODO - consider creating a "get all jobs" controller function, but build it as a helper and add to jobs by program and/or jobs by credential.
