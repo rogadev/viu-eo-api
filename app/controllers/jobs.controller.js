@@ -79,3 +79,17 @@ exports.jobsByProgram = function (req, res) {
   }
   res.send(results)
 }
+
+/**
+ * Find all the jobs related to this unit group and return found array, or send 500 status.
+ * @param noc The NOC code to find
+ * @returns If found, it will return the array of jobs related to this unit group.
+ */
+exports.getJobs = (req, res) => {
+  const noc = req.params.noc
+  if (noc) {
+    const result = unitGroups.find((group) => group.noc === noc)
+    if (result) res.json(result.jobs)
+  }
+  res.status(500).send('Something went wrong')
+}
