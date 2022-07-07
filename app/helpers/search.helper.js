@@ -77,14 +77,8 @@ module.exports = (keywordObject) => {
       // One keyword combo will be a combination of credential and search terms (e.g. ['degree', 'programming'])
 
       // Break out each group's requirement's into an array
-      const groupRequirements = group.sections.find((section) =>
-        section.title.includes('Employment requirements')
-      )
-      const rawRequirements = groupRequirements.items
-      // There is an issue with requirements - formatting did not remove + signs or \n characters. This breaks array functions.
-      const requirements = rawRequirements.reduce((items, item) => {
-        return [...items, ('' + item).replace(/[\r\n]/gm, '').trim()]
-      }, [])
+      const requirements = group.requirements
+
       // For every requirement, check if it matches the keyword combo
       for (const requirement of requirements) {
         if (keywordCombo.every((keyword) => requirement.includes(keyword))) {
@@ -110,9 +104,7 @@ module.exports = (keywordObject) => {
 
   for (const group of groupResults) {
     pushIfUnique(results.groups, group)
-    const jobSection = group.sections.find((section) =>
-      section.title.includes('Illustrative example(s)')
-    )
+    const jobSection = group.jobs
     jobs.push({
       noc: group.noc,
       jobs: jobSection.items,
