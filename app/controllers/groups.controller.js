@@ -17,6 +17,7 @@ exports.getGroup = (req, res) => {
   }
   res.status(500).send('Something went wrong.')
 }
+// TODO - imlement in a route.
 
 /**
  * Get all unit groups, based on NOC, passed in as query string.
@@ -33,3 +34,5 @@ exports.getGroups = (req, res) => {
   if (results) res.json(results)
   res.status(500).send('Something went wrong')
 }
+
+// TODO - imlement in a route.
