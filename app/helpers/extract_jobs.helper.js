@@ -1,6 +1,3 @@
-// DATA
-const unitGroups = require('../data/noc/2016/noc_2016_unit_groups.json')
-
 // HELPERS
 const { pushIfUnique, ensureArray } = require('./array.helpers.js')
 
@@ -11,7 +8,7 @@ const { pushIfUnique, ensureArray } = require('./array.helpers.js')
  * @returns An array of jobs item objects - ex. [{noc: 1234, titles: ['','','',...]},{...},{...},...]
  */
 module.exports = (arr, nocVersion = 2016) => {
-  const unitGroupsArray = [...arr]
+  const unitGroupsArray = ensureArray([...arr])
   const unitGroups =
     nocVersion === 2021
       ? require('../data/noc/2021/noc_2021_unit_groups.json')
@@ -20,17 +17,15 @@ module.exports = (arr, nocVersion = 2016) => {
   const jobs = []
 
   for (const unitGroup of unitGroups) {
-    if (unitGroupsArray.find((ug) => ug.noc === unitGroup.noc)) {
-      const jobsSection = unitGroup.sections.find((section) =>
-        section.title.includes('Illustrative example(s)')
-      )
-      for (const job of jobsSection.items) {
-        const item = {
-          noc: unitGroup.noc,
-          titles: [],
-        }
-        pushIfUnique(jobs, item)
+    if (unitGroupsArray.includes(unitGroup.noc)) {
+      const jobs = unitGroup.jobs
+
+      const item = {
+        noc: unitGroup.noc,
+        titles: jobs,
       }
+
+      pushIfUnique(jobs, item)
     }
   }
 
