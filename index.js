@@ -15,15 +15,15 @@ App.use(express.json())
 // FALLBACK ROUTE
 App.get('/', (req, res) =>
   res.send(`
-/api/v1/test - Test route.
-/api/v1/fix - Data Fixing Route (mothballed).
-/api/v1/area/:nid - Returns area based on its NID.
-/api/v1/program/:nid - Returns program based on its NID.
-/api/v1/program/area/:nid - Returns area based on program NID.
-/api/v1/programs - Returns list of all programs offered at VIU.
-/api/v1/programs/searchable - Returns list of all searchable programs.
-/api/v1/jobs/program/:nid - Returns list of all searchable programs.
-/api/v1/jobs/credential - Returns list of jobs based on a given credential and keywords query.
+/api/v1/test - Test route.\n
+/api/v1/fix - Data Fixing Route (mothballed).\n
+/api/v1/area/:nid - Returns area based on its NID.\n
+/api/v1/program/:nid - Returns program based on its NID.\n
+/api/v1/program/area/:nid - Returns area based on program NID.\n
+/api/v1/programs - Returns list of all programs offered at VIU.\n
+/api/v1/programs/searchable - Returns list of all searchable programs.\n
+/api/v1/jobs/program/:nid - Returns list of all searchable programs.\n
+/api/v1/jobs/credential - Returns list of jobs based on a given credential and keywords query.\n
 `)
 )
 
