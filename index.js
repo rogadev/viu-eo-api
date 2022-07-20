@@ -4,14 +4,15 @@ require('colors')
 
 // EXPRESS APP
 const express = require('express')
-require('cors').config()
 const App = express()
 
 // MAIN ROUTER
 const MainRouter = require('./app/routes')
 
 // MIDDLEWARE
+const cors = require('cors')
 App.use(express.json())
+App.use(cors())
 
 // FALLBACK ROUTE
 App.get('/', (req, res) =>
