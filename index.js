@@ -4,6 +4,7 @@ require('colors')
 
 // EXPRESS APP
 const express = require('express')
+require('cors').config()
 const App = express()
 
 // MAIN ROUTER
