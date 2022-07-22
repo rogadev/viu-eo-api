@@ -58,7 +58,7 @@ router.get(
   jobs.jobsByCredential
 )
 
-router.ger('/jobs/:nid', jobs.jobsByNid)
+router.get('/jobs/:nid', jobs.jobsByNid)
 //TODO put the middle ware back in
 
 // NESTED ROUTES
