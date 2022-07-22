@@ -58,6 +58,8 @@ router.get(
   jobs.jobsByCredential
 )
 
+router.ger('/jobs/:nid', jobsMW.requiresNidParam, jobs.jobsByNid)
+
 // NESTED ROUTES
 router.use('/scrape', require('./scrape'))
 router.use('/outlook', require('./outlook'))
