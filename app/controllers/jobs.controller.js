@@ -116,5 +116,5 @@ exports.getJobsNid = (req, res) => {
       outlook: 3,
     },
   ]
-  res.json(result.jobs)
+  res.json(result)
 }
