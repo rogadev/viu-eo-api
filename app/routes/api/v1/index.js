@@ -58,7 +58,8 @@ router.get(
   jobs.jobsByCredential
 )
 
-router.ger('/jobs/:nid', jobsMW.requiresNidParam, jobs.jobsByNid)
+router.ger('/jobs/:nid', jobs.jobsByNid)
+//TODO put the middle ware back in
 
 // NESTED ROUTES
 router.use('/scrape', require('./scrape'))
