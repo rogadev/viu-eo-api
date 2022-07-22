@@ -6,6 +6,7 @@ const programs = require('../data/viu/searchable_programs.json') // NOTE: Only u
 const search = require('../helpers/search.helper.js')
 const { pushIfUnique, ensureArray } = require('../helpers/array.helpers.js')
 const extractJobs = require('../helpers/extract_jobs.helper.js')
+const { getOutlook } = require('../helpers/outlook.helpers.js')
 
 // CONTROLLER FUNCTIONS
 
@@ -99,27 +100,81 @@ exports.getJobs = (req, res) => {
 // TODO - consider creating a "get all jobs" controller function, but build it as a helper and add to jobs by program and/or jobs by credential.
 
 exports.getJobsNid = (req, res) => {
-  const result = {
-    jobs: [
-      {
-        title: 'Some Job',
-        noc: '1234',
-        outlook: 2,
-        outlook_verbose: 'Good',
-      },
-      {
-        title: 'Another Job',
-        noc: '1245',
-        outlook: 1,
-        outlook_verbose: 'Poor',
-      },
-      {
-        title: 'Best Job Ever',
-        noc: '9999',
-        outlook: 3,
-        outlook_verbose: 'Excellent',
-      },
-    ],
+  // Find the program using it's NID
+  const program = programs.find(
+    (program) => program.nid.toString() === req.params.nid
+  )
+  // Extract NOC searchable keywords (searched using the search() helper function)
+  const nocKeywords = program.noc_search_keywords
+    ? program.noc_search_keywords
+    : null
+  // Extract all known NOC unit groups - this is an array of NOC unit group numbers as strings.
+  const knownGroups = program.known_noc_groups ?? null
+
+  // Collector Array
+  const jobResults = []
+
+  // Only attempt to search if we have keywords to search with
+  if (nocKeywords) {
+    const credential = program.credential
+    const keywords = {
+      credential: [...ensureArray(credential)],
+      search: [...ensureArray(nocKeywords)],
+    }
+    const results = search(keywords)
+    results.jobs.forEach((result) => {
+      const noc = result.noc
+      const jobs = result.jobs
+      jobs.forEach((job) => {
+        pushIfUnique(jobResults, { noc, title: job })
+      })
+    })
   }
-  res.json(result)
+
+  // Only add known unit groups if the program we're referencing has any
+  if (knownGroups) {
+    knownGroups.forEach((nocString) => {
+      // Search for a matching unit group using the NOC unit group number
+      const groupResult = unitGroups.find(
+        (uGroup) => nocString === uGroup.noc.toString()
+      )
+      // It's possible that there are no group results due to a bad data, or a breaking change, so we'll check for that.
+      if (groupResult) {
+        pushIfUnique(groupResults, groupResult)
+        const jobs = extractJobs([groupResult.noc])
+        jobs.forEach((job) => pushIfUnique(jobResults, job))
+      }
+    })
+    knownGroups.forEach((nocString) => {
+      const groups = unitGroups.find(
+        (uGroup) => nocString === uGroup.noc.toString()
+      )
+      if (results) {
+        groups.forEach((group) => {
+          const noc = group.noc
+          const jobs = group.jobs
+          jobs.forEach((job) => {
+            pushIfUnique(jobResults, { noc, title: job })
+          })
+        })
+      }
+    })
+  }
+
+  // const applicableNOCs = []
+  // jobResults.forEach((job) => pushIfUnique(applicableNOCs, job.noc))
+
+  // const outlooks = []
+  // applicableNOCs.forEach(async (noc) => {
+  //   const outlook = await getOutlook(noc)
+  //   outlooks.push({ noc, outlook: outlook.potential, trends: outlook.trends })
+  // })
+
+  // console.log(outlooks)
+
+  // Form response and send.
+  const results = {
+    jobs: jobResults,
+  }
+  res.send(results)
 }
