@@ -45,6 +45,8 @@ router.get('/programs/all', programs.findAll)
 // GET /api/v1/programs/searchable - Returns list of all searchable programs.
 router.get('/programs/searchable', programs.findSearchable)
 
+router.get('/jobs/:nid', jobs.jobsByNid)
+
 // GET /api/v1/jobs/program/:nid - Returns list of all searchable programs.
 router.get(
   '/jobs/program/:nid',
@@ -58,7 +60,6 @@ router.get(
   jobs.jobsByCredential
 )
 
-router.get('/jobs/:nid', jobs.jobsByNid)
 //TODO put the middle ware back in
 
 // NESTED ROUTES
