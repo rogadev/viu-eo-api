@@ -99,22 +99,24 @@ exports.getJobs = (req, res) => {
 // TODO - consider creating a "get all jobs" controller function, but build it as a helper and add to jobs by program and/or jobs by credential.
 
 exports.getJobsNid = (req, res) => {
-  const result = [
-    {
-      title: 'Some Job',
-      noc: '1234',
-      outlook: 2,
-    },
-    {
-      title: 'Another Job',
-      noc: '1245',
-      outlook: 1,
-    },
-    {
-      title: 'Best Job Ever',
-      noc: '9999',
-      outlook: 3,
-    },
-  ]
+  const result = {
+    jobs: [
+      {
+        title: 'Some Job',
+        noc: '1234',
+        outlook: 2,
+      },
+      {
+        title: 'Another Job',
+        noc: '1245',
+        outlook: 1,
+      },
+      {
+        title: 'Best Job Ever',
+        noc: '9999',
+        outlook: 3,
+      },
+    ],
+  }
   res.json(result)
 }
