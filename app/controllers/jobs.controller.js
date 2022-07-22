@@ -105,16 +105,19 @@ exports.getJobsNid = (req, res) => {
         title: 'Some Job',
         noc: '1234',
         outlook: 2,
+        outlook_verbose: 'Good',
       },
       {
         title: 'Another Job',
         noc: '1245',
         outlook: 1,
+        outlook_verbose: 'Poor',
       },
       {
         title: 'Best Job Ever',
         noc: '9999',
         outlook: 3,
+        outlook_verbose: 'Excellent',
       },
     ],
   }
