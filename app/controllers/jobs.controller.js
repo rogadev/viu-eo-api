@@ -7,6 +7,7 @@ const search = require('../helpers/search.helper.js')
 const { pushIfUnique, ensureArray } = require('../helpers/array.helpers.js')
 const extractJobs = require('../helpers/extract_jobs.helper.js')
 const { getOutlook } = require('../helpers/outlook.helpers.js')
+const { titleCase } = require('../helpers/string.helpers')
 
 // CONTROLLER FUNCTIONS
 
@@ -190,14 +191,13 @@ exports.getJobsNid = async (req, res) => {
     ).outlook
     const result = {
       noc: job.noc,
-      title: job.title,
+      title: titleCase(job.title),
       outlook: outlookNumber,
       outlook_verbose: verbify(outlookNumber),
       trends: outlooks.find((outlook) => outlook.noc === job.noc).trends,
     }
     finalResults.push(result)
   })
-  console.log(finalResults)
 
   // Form response and send.
 
