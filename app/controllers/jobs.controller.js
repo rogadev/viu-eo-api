@@ -98,7 +98,7 @@ exports.getJobs = (req, res) => {
 
 // TODO - consider creating a "get all jobs" controller function, but build it as a helper and add to jobs by program and/or jobs by credential.
 
-exports.getJobs = (req, res) => {
+exports.getJobsNid = (req, res) => {
   const noc = req.params.noc
   if (noc) {
     const result = [
