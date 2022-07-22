@@ -170,12 +170,29 @@ exports.getJobsNid = async (req, res) => {
     outlooks.push({ noc, outlook: outlook.potential, trends: outlook.trends })
   }
 
+  function verbify(num) {
+    switch (num) {
+      case 1:
+        return 'Good'
+      case 2:
+        return 'Limited'
+      case 3:
+        return 'Fair'
+      default:
+        return 'Undetermined'
+    }
+  }
+
   const finalResults = []
   jobResults.forEach((job) => {
+    const outlookNumber = outlooks.find(
+      (outlook) => outlook.noc === job.noc
+    ).outlook
     const result = {
       noc: job.noc,
       title: job.title,
-      outlook: outlooks.find((outlook) => outlook.noc === job.noc).outlook,
+      outlook: outlookNumber,
+      outlook_verbose: verbify(outlookNumber),
       trends: outlooks.find((outlook) => outlook.noc === job.noc).trends,
     }
     finalResults.push(result)
