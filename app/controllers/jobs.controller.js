@@ -99,7 +99,7 @@ exports.getJobs = (req, res) => {
 
 // TODO - consider creating a "get all jobs" controller function, but build it as a helper and add to jobs by program and/or jobs by credential.
 
-exports.getJobsNid = (req, res) => {
+exports.getJobsNid = async (req, res) => {
   // Find the program using it's NID
   const program = programs.find(
     (program) => program.nid.toString() === req.params.nid
@@ -161,20 +161,30 @@ exports.getJobsNid = (req, res) => {
     })
   }
 
-  // const applicableNOCs = []
-  // jobResults.forEach((job) => pushIfUnique(applicableNOCs, job.noc))
+  const applicableNOCs = []
+  jobResults.forEach((job) => pushIfUnique(applicableNOCs, job.noc))
 
-  // const outlooks = []
-  // applicableNOCs.forEach(async (noc) => {
-  //   const outlook = await getOutlook(noc)
-  //   outlooks.push({ noc, outlook: outlook.potential, trends: outlook.trends })
-  // })
+  const outlooks = []
+  for (const noc of applicableNOCs) {
+    const outlook = await getOutlook(noc)
+    outlooks.push({ noc, outlook: outlook.potential, trends: outlook.trends })
+  }
 
-  // console.log(outlooks)
+  const finalResults = []
+  jobResults.forEach((job) => {
+    const result = {
+      noc: job.noc,
+      title: job.title,
+      outlook: outlooks.find((outlook) => outlook.noc === job.noc).outlook,
+      trends: outlooks.find((outlook) => outlook.noc === job.noc).trends,
+    }
+    finalResults.push(result)
+  })
+  console.log(finalResults)
 
   // Form response and send.
-  const results = {
-    jobs: jobResults,
-  }
-  res.send(results)
+
+  res.send({
+    jobs: finalResults,
+  })
 }
