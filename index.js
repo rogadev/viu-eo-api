@@ -37,7 +37,7 @@ App.use(require('./app/middleware/error.middleware.js')) // must come after othe
 
 // START SERVER
 App.listen(process.env.PORT, () => {
-  console.log('Server is', 'running'.green, 'on port', '3000'.green)
+  console.log('Server is', 'running'.green, 'on port', process.env.PORT.green)
   console.log(
     'Follow link',
     '(ctrl + click)'.cyan,
