@@ -1,6 +1,7 @@
 // DATA
 const unitGroups = require('../data/noc/2016/noc_2016_unit_groups.json')
 const programs = require('../data/viu/searchable_programs.json') // NOTE: Only using searchable programs. Not all programs will return results.
+const { getProgram } = require('../helpers/viu_data.helpers.js')
 
 // HELPERS
 const search = require('../helpers/search.helper.js')
@@ -102,15 +103,22 @@ exports.getJobs = (req, res) => {
 
 exports.getJobsNid = async (req, res) => {
   // Find the program using it's NID
-  const program = programs.find(
-    (program) => program.nid.toString() === req.params.nid
-  )
+  const result = await getProgram(req.params.nid)
+  const program = result?.program
+  const error = result?.error
+  if (error) {
+    res.status(500).send(error)
+  }
+
   // Extract NOC searchable keywords (searched using the search() helper function)
-  const nocKeywords = program.noc_search_keywords
-    ? program.noc_search_keywords
-    : null
+  const nocKeywords = program?.noc_search_keywords
+
   // Extract all known NOC unit groups - this is an array of NOC unit group numbers as strings.
-  const knownGroups = program.known_noc_groups ?? null
+  const knownGroups = program?.known_noc_groups
+
+  if (!nocKeywords && !knownGroups) {
+    res.status(500).send('No NOC keywords or known groups found')
+  }
 
   // Collector Array
   const jobResults = []
