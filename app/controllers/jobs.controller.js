@@ -104,7 +104,7 @@ exports.getJobs = (req, res) => {
 exports.getJobsNid = async (req, res) => {
   // Find the program using it's NID
   const result = await getProgram(req.params.nid)
-  const program = result?.program
+  const program = result?.result
   const error = result?.error
   if (error) {
     return res.status(500).send(error)
@@ -112,12 +112,12 @@ exports.getJobsNid = async (req, res) => {
 
   // Extract NOC searchable keywords (searched using the search() helper function)
   const nocKeywords = searchablePrograms.find(
-    (program) => program.nid === req.params.nid
+    (program) => Number(program.nid) === Number(req.params.nid)
   )?.noc_search_keywords
 
   // Extract all known NOC unit groups - this is an array of NOC unit group numbers as strings.
   const knownGroups = searchablePrograms.find(
-    (program) => program.nid === req.params.nid
+    (program) => Number(program.nid) === Number(req.params.nid)
   )?.known_noc_groups
 
   console.log(nocKeywords, knownGroups)
