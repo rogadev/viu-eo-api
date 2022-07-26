@@ -39,10 +39,10 @@ App.use(require('./app/middleware/error.middleware.js')) // must come after othe
 App.listen(process.env.PORT, () => {
   console.log('Server is', 'running'.green, 'on port', process.env.PORT.green)
   console.log(
-    'Follow link',
+    'Dev link',
     '(ctrl + click)'.cyan,
     '->'.magenta,
-    'http://localhost:3000/api/v1/test'.blue
+    `http://localhost:${process.env.PORT}/api/v1/test`.blue
   )
   console.log(
     'Deployed link',
