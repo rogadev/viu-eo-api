@@ -97,11 +97,11 @@ exports.getJobs = (req, res) => {
   }
   res.status(500).send('Something went wrong')
 }
-// TODO - imlement in a route.
 
-// TODO - consider creating a "get all jobs" controller function, but build it as a helper and add to jobs by program and/or jobs by credential.
-
-exports.getJobsNid = async (req, res) => {
+/**
+ * Get a list of jobs related to a given NID, including the employment outlook in BC.
+ */
+exports.getJobsAndOutlook = async (req, res) => {
   // Find the program using it's NID
   const result = await getProgram(req.params.nid)
   const program = result?.result
@@ -148,31 +148,9 @@ exports.getJobsNid = async (req, res) => {
 
   // Only add known unit groups if the program we're referencing has any
   if (knownGroups) {
-    knownGroups.forEach((nocString) => {
-      // Search for a matching unit group using the NOC unit group number
-      const groupResult = unitGroups.find(
-        (uGroup) => nocString === uGroup.noc.toString()
-      )
-      // It's possible that there are no group results due to a bad data, or a breaking change, so we'll check for that.
-      if (groupResult) {
-        pushIfUnique(groupResults, groupResult)
-        const jobs = extractJobs([groupResult.noc])
-        jobs.forEach((job) => pushIfUnique(jobResults, job))
-      }
-    })
-    knownGroups.forEach((nocString) => {
-      const groups = unitGroups.find(
-        (uGroup) => nocString === uGroup.noc.toString()
-      )
-      if (results) {
-        groups.forEach((group) => {
-          const noc = group.noc
-          const jobs = group.jobs
-          jobs.forEach((job) => {
-            pushIfUnique(jobResults, { noc, title: job })
-          })
-        })
-      }
+    const jobs = extractJobs(knownGroups)
+    jobs.forEach((job) => {
+      pushIfUnique(jobResults, job)
     })
   }
 
@@ -182,33 +160,24 @@ exports.getJobsNid = async (req, res) => {
   const outlooks = []
   for (const noc of applicableNOCs) {
     const outlook = await getOutlook(noc)
-    outlooks.push({ noc, outlook: outlook.potential, trends: outlook.trends })
-  }
-
-  function verbify(num) {
-    switch (num) {
-      case 1:
-        return 'Good'
-      case 2:
-        return 'Limited'
-      case 3:
-        return 'Fair'
-      default:
-        return 'Undetermined'
-    }
+    pushIfUnique(outlooks, {
+      noc,
+      outlook: outlook.potential,
+      outlook_verbose: outlook.outlook_verbose,
+    })
   }
 
   const finalResults = []
   jobResults.forEach((job) => {
-    const outlookNumber = outlooks.find(
-      (outlook) => outlook.noc === job.noc
-    ).outlook
+    const outlook = outlooks.find((outlook) => outlook.noc === job.noc)
+    const outlookNumber = outlook.outlook
+    const verbose = outlook.outlook_verbose
+
     const result = {
       noc: job.noc,
       title: titleCase(job.title),
       outlook: outlookNumber,
-      outlook_verbose: verbify(outlookNumber),
-      trends: outlooks.find((outlook) => outlook.noc === job.noc).trends,
+      outlook_verbose: verbose,
     }
     finalResults.push(result)
   })
