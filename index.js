@@ -26,6 +26,7 @@ App.get('/', (req, res) =>
 <a href="/api/v1/programs/searchable">/api/v1/programs/searchable</a> - Returns list of all searchable programs.<br>
 <a href="/api/v1/jobs/program/9143">/api/v1/jobs/program/:nid</a> - Returns list of jobs based on a given NID param.<br>
 <a href="/api/v1/jobs/credential">/api/v1/jobs/credential</a> - Returns list of jobs based on a given credential and keywords query.<br>
+<a href="/api/v1/jobs/9143">/api/v1/jobs</a> - Returns list of all jobs with related employment outlook details.<br>
 `)
 )
 
@@ -42,7 +43,7 @@ App.listen(process.env.PORT, () => {
     'Dev link',
     '(ctrl + click)'.cyan,
     '->'.magenta,
-    `http://localhost:${process.env.PORT}/api/v1/test`.blue
+    `http://localhost:${process.env.PORT}`.blue
   )
   console.log(
     'Deployed link',
