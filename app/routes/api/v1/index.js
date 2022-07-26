@@ -45,7 +45,7 @@ router.get('/programs/all', programs.findAll)
 // GET /api/v1/programs/searchable - Returns list of all searchable programs.
 router.get('/programs/searchable', programs.findSearchable)
 
-router.get('/jobs/:nid', jobs.getJobsNid)
+router.get('/jobs/:nid', jobs.getJobsAndOutlook)
 
 // GET /api/v1/jobs/program/:nid - Returns list of all searchable programs.
 router.get(
