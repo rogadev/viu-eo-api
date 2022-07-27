@@ -171,13 +171,15 @@ exports.getJobsAndOutlook = async (req, res) => {
       })
     })
     if (jobResults.length === 0) {
-      // return an error - bad input
+      return res.json({ jobs: [] })
       return res
         .status(204)
-        .send(
-          'This program NID does not have nocKeywords or knownGroups properties. This makes it very hard to search for. consider adding one or both of these properties to the program.' +
-            `(nid: ${req.params.nid})`
-        )
+        .json({
+          jobs: [],
+          message:
+            'This program NID does not have nocKeywords or knownGroups properties. This makes it very hard to search for. consider adding one or both of these properties to the program.' +
+            `(nid: ${req.params.nid})`,
+        })
     }
   }
 
