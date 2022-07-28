@@ -64,3 +64,23 @@ exports.provincialOutlook = async function (req, res) {
     res.status(e.status ?? 500).send(e)
   }
 }
+
+/**
+ * Get the BC Provincial outlook.
+ */
+exports.bcProvincialOutlook = async function (req, res) {
+  const noc = req.params.noc
+  const prov = 59
+  try {
+    let outlook = provincialOutlooksCache.get(`${noc}-${prov}`)
+    if (!outlook) {
+      const apiResponse = await fetchProvincialOutlook(noc, prov)
+      outlook = await apiResponse.json()
+      provincialOutlooksCache.set(`${noc}-${prov}`, outlook)
+    }
+    res.send(outlook)
+  } catch (e) {
+    console.error(e)
+    res.status(e.status ?? 500).send(e)
+  }
+}
