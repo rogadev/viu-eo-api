@@ -45,6 +45,7 @@ router.get('/programs/all', programs.findAll)
 // GET /api/v1/programs/searchable - Returns list of all searchable programs.
 router.get('/programs/searchable', programs.findSearchable)
 
+// GET /api/v1/jobs/:nid - Returns job based on its NID.
 router.get('/jobs/:nid', jobs.getJobsAndOutlook)
 
 // GET /api/v1/jobs/program/:nid - Returns list of all searchable programs.
@@ -54,17 +55,17 @@ router.get(
   jobs.jobsByProgram
 )
 
+// GET /api/v1/jobs/credential - Returns list of all searchable programs. (requires query params)
 router.get(
   '/jobs/credential',
   jobsMW.requiresCredentialQuery,
   jobs.jobsByCredential
 )
 
-//TODO put the middle ware back in
-
 // NESTED ROUTES
 router.use('/scrape', require('./scrape'))
 router.use('/outlook', require('./outlook'))
+router.use('/noc', require('./noc'))
 
 // EXPORT
 module.exports = router
