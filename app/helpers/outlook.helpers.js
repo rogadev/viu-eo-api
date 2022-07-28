@@ -28,7 +28,7 @@ const getOutlook = async (noc) => {
     } else {
       console.log(`Using cached outlook for ${noc}`)
     }
-    outlook = fixPotential(outlook)
+    outlook = refactorOutlookWithLogicalPotential(outlook)
     return outlook
   } catch (error) {
     return new Error(error)
@@ -40,7 +40,7 @@ const getOutlook = async (noc) => {
  * @param {Number} outlook - The outlook data to fix.
  * @returns The fixed outlook data with corrected potential value.
  */
-function fixPotential(outlook) {
+function refactorOutlookWithLogicalPotential(outlook) {
   const potential = outlook.potential
   let newPotential
   switch (Number(potential)) {
@@ -113,4 +113,5 @@ module.exports = {
   fetchNationalOutlook,
   fetchProvincialOutlook,
   verbifyOutlookValue,
+  refactorOutlookWithLogicalPotential,
 }
