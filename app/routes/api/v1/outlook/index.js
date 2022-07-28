@@ -7,6 +7,7 @@ const outlookMW = require('../../../../middleware/outlook.middleware.js')
 // CONTROLLERS
 const outlooks = require('../../../../controllers/outlook.controller.js')
 
+// GET /api/v1/outlook/:noc - Get the unit group for the given NOC.
 router.get('/:noc', outlookMW.requiresNocParam, outlooks.bcProvincialOutlook)
 
 // GET /api/v1/national/outlook/:noc - Returns area based on program NID.
