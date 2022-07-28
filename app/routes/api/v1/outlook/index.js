@@ -7,6 +7,8 @@ const outlookMW = require('../../../../middleware/outlook.middleware.js')
 // CONTROLLERS
 const outlooks = require('../../../../controllers/outlook.controller.js')
 
+router.get('/:noc', outlookMW.requiresNocParam, outlooks.bcProvincialOutlook)
+
 // GET /api/v1/national/outlook/:noc - Returns area based on program NID.
 router.get(
   '/national/:noc',
