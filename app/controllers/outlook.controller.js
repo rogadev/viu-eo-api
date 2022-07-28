@@ -12,6 +12,7 @@ headers.append('USER_KEY', process.env.USER_KEY)
 const {
   fetchNationalOutlook,
   fetchProvincialOutlook,
+  refactorOutlookWithLogicalPotential,
 } = require('../helpers/outlook.helpers.js')
 
 // CONTROLLER FUNCTIONS
@@ -78,7 +79,8 @@ exports.bcProvincialOutlook = async function (req, res) {
       outlook = await apiResponse.json()
       provincialOutlooksCache.set(`${noc}-${prov}`, outlook)
     }
-    res.send(outlook)
+    console.log(outlook.potential)
+    res.send(refactorOutlookWithLogicalPotential(outlook))
   } catch (e) {
     console.error(e)
     res.status(e.status ?? 500).send(e)
