@@ -22,8 +22,12 @@ exports.jobsByCredential = function (req, res) {
     credential: [...ensureArray(req.query.credential)],
     search: [...ensureArray(req.query.keywords)],
   }
+  // Search the data for matching unit groups
   const result = search(keywords)
-  res.send(result)
+  // If result returns with an error property, send error.
+  if (result.error) res.status(500).send(result.error)
+  // If no error, send the results.
+  else res.send(result)
 }
 
 /**
@@ -150,7 +154,7 @@ exports.getJobsAndOutlook = async (req, res) => {
 
   // If we don't have either nocKeywords or knownGroups, we'll have to guess what to search for. This won't be the best outcome.
   if (!nocKeywords && !knownGroups) {
-    const credential = program.credential // TODO We used to be upgrading our credential to account for more variations that we sometimes find in the data. Ex. "certificate" might be "red seal" or "apprenticeship program" or "trades school".
+    const credential = program.credential // TODO We used to be expand our credential keywords to include a wide range of variations that we sometimes find in the data. Ex. "certificate" might be "red seal" or "apprenticeship program" or "trades school".
     let programTitle = program?.title
     if (programTitle) programTitle = programTitle.trim()
     let programKeywords = program?.field_viu_search_keywords

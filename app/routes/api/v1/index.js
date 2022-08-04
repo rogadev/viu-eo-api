@@ -57,7 +57,7 @@ router.get(
 
 // GET /api/v1/jobs/credential - Returns list of all searchable programs. (requires query params)
 router.get(
-  '/jobs/credential',
+  '/jobs-by-credential',
   jobsMW.requiresCredentialQuery,
   jobs.jobsByCredential
 )

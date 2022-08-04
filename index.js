@@ -26,7 +26,7 @@ App.get('/', (req, res) =>
 <a href="/api/v1/programs">/api/v1/programs</a> - Returns list of all programs offered at VIU.<br>
 <a href="/api/v1/programs/searchable">/api/v1/programs/searchable</a> - Returns list of all searchable programs.<br>
 <a href="/api/v1/jobs/program/9143">/api/v1/jobs/program/:nid</a> - Returns list of jobs based on a given NID param.<br>
-<a href="/api/v1/jobs/credential">/api/v1/jobs/credential</a> - Returns list of jobs based on a given credential and keywords query.<br>
+<a href="/api/v1/jobs-by-credential?credential=degree&keywords=computer+science">/api/v1/jobs-by-credential</a> - Returns list of jobs based on a given credential and keywords query.<br>
 <a href="/api/v1/jobs/9143">/api/v1/jobs</a> - Returns list of all jobs with related employment outlook details.<br>
 `)
 )

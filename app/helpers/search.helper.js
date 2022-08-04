@@ -60,12 +60,24 @@ const expandCredentials = (credentials) => {
  * @param {Object} keywords - An object containing credential keywords and search keywords.
  * @returns An object containing jobs and groups, relevant to the given search.
  */
-module.exports = (keywordObject) => {
-  const unitGroups = require('../data/noc/2016/noc_2016_unit_groups.json')
-  const { credential, search: searchTerms } = keywordObject
-  const expandedCredentialTermsArray = expandCredentials(credential)
+module.exports = ({ credential, search: searchTerms }) => {
+  // Validate that we have both a credential and search terms. Return empty if not. Note: this should be caught by middleware prior to getting here.
+  if (!credential || !searchTerms) return { error: 'Missing search terms.' }
+
+  const allUnitGroups = require('../data/noc/2016/noc_2016_unit_groups.json')
+  // Filter out unit groups that require years of experience.
+  const unitGroups = allUnitGroups.filter(
+    ({ requirements }) =>
+      !requirements.some((requirement) =>
+        requirement.toLowerCase().includes('years of experience')
+      )
+  )
+
+  // Expand credential to include additional, related keywords. eg. 'degree' => ['diploma', 'certificate', 'college program']
+  const expandedCredentialKeywords = expandCredentials(credential)
+  // Derive all combinations of credential and search keywords.
   const keywordCombinationsArray = keywordCombinator(
-    expandedCredentialTermsArray,
+    expandedCredentialKeywords,
     searchTerms
   )
 
@@ -73,11 +85,11 @@ module.exports = (keywordObject) => {
   const groupResults = []
 
   for (const group of unitGroups) {
+    // Break out each group's requirement's into an array
+    const requirements = group.requirements
+
     for (const keywordCombo of keywordCombinationsArray) {
       // One keyword combo will be a combination of credential and search terms (e.g. ['degree', 'programming'])
-
-      // Break out each group's requirement's into an array
-      const requirements = group.requirements
 
       // For every requirement, check if it matches the keyword combo
       for (const requirement of requirements) {
