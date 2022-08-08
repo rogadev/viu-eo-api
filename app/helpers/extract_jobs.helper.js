@@ -23,5 +23,3 @@ module.exports = (arr) => {
 
   return jobResults
 }
-
-// TODO - test this function!
