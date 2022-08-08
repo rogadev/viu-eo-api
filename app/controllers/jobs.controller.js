@@ -49,7 +49,6 @@ exports.jobsByProgram = function (req, res) {
 
   // Collector Arrays
   const jobResults = []
-  const groupResults = []
 
   // Only attempt to search if we have keywords to search with
   if (nocKeywords) {
@@ -60,21 +59,22 @@ exports.jobsByProgram = function (req, res) {
     }
     const results = search(keywords)
     results.jobs.forEach((result) => pushIfUnique(jobResults, result))
-    results.groups.forEach((result) => pushIfUnique(groupResults, result))
   }
 
   // Only add known unit groups if the program we're referencing has any
   if (knownGroups) {
-    knownGroups.forEach((nocString) => {
+    knownGroups.forEach((knownGroup) => {
       // Search for a matching unit group using the NOC unit group number
       const groupResult = unitGroups.find(
-        (uGroup) => nocString === uGroup.noc.toString()
+        (unitGroup) => knownGroup === unitGroup.noc.toString()
       )
       // It's possible that there are no group results due to a bad data, or a breaking change, so we'll check for that.
       if (groupResult) {
-        pushIfUnique(groupResults, groupResult)
-        const jobs = extractJobs([groupResult.noc])
-        jobs.forEach((job) => pushIfUnique(jobResults, job))
+        const noc = groupResult.noc
+        const listOfJobs = groupResult.jobs
+        listOfJobs.forEach((title) => {
+          pushIfUnique(jobResults, { noc, title: titleCase(title) })
+        })
       }
     })
   }
@@ -82,9 +82,7 @@ exports.jobsByProgram = function (req, res) {
   // Form response and send.
   const results = {
     jobs: jobResults,
-    groups: groupResults,
   }
-  // TODO - Remove the groups from this response. Send only jobs as array of objects.
   res.send(results)
 }
 
@@ -135,12 +133,11 @@ exports.getJobsAndOutlook = async (req, res) => {
       search: [...ensureArray(nocKeywords)],
     }
     const results = search(keywords)
+    if (!results.jobs) {
+      return
+    }
     results.jobs.forEach((result) => {
-      const noc = result.noc
-      const jobs = result.jobs
-      jobs.forEach((job) => {
-        pushIfUnique(jobResults, { noc, title: job })
-      })
+      pushIfUnique(jobResults, result)
     })
   }
 
