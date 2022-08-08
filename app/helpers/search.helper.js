@@ -1,5 +1,6 @@
 // HELPERS
 const { pushIfUnique } = require('./array.helpers.js')
+const { titleCase } = require('./string.helpers.js')
 
 /**
  * Creates every possible combination of the keywords in each array. Used for searching through NOC unit groups, specifically the "requirements" section.
@@ -103,23 +104,21 @@ module.exports = ({ credential, search: searchTerms }) => {
   // Collector
   const results = {
     jobs: [],
-    groups: [],
   }
 
   // At this point, if we have no group results, we can return our empty array.
-  if (!(groupResults.length > 0)) {
+  if (!(groupResults.length >= 0)) {
     console.log('return with no found results')
-    return results
+    return { error: 'No results found.' }
   }
 
   const jobs = []
 
   for (const group of groupResults) {
-    pushIfUnique(results.groups, group)
-    const jobSection = group.jobs
-    jobs.push({
-      noc: group.noc,
-      jobs: jobSection,
+    const noc = group.noc
+    const listOfJobs = group.jobs
+    listOfJobs.forEach((job) => {
+      pushIfUnique(jobs, { noc, title: titleCase(job) })
     })
   }
 
