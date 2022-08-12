@@ -7,7 +7,7 @@ const { getProgram } = require('../helpers/viu_data.helpers.js')
 // HELPERS
 const search = require('../helpers/search.helper.js')
 const { pushIfUnique, ensureArray } = require('../helpers/array.helpers.js')
-const extractJobs = require('../helpers/extract_jobs.helper.js')
+const findJobsForUnitGroups = require('../helpers/extract_jobs.helper.js')
 const { getOutlook } = require('../helpers/outlook.helpers.js')
 const { titleCase } = require('../helpers/string.helpers')
 
@@ -29,7 +29,7 @@ exports.jobsByCredential = function (req, res) {
   if (result.error) res.status(500).send(result.error)
   // If no error, send the results.
   else res.send(result)
-}
+} // WORKING August 12, 2022
 
 /**
  * Receives a program NID as a parameter, uses the NID to extrapolate credential keywords and search keywords. Queries
@@ -37,43 +37,38 @@ exports.jobsByCredential = function (req, res) {
  * @returns An object containing jobs and groups, relevant to the given search.
  */
 exports.jobsByProgram = function (req, res) {
-  // TODO - Later, as all programs become searchable from the VIU live data, we should switch this function to account for this.
   // Check the searchable programs, first. We have some hard coded data, there.
   const foundSearchableProgram =
     searchablePrograms.find(
       (program) => program.nid.toString() === req.params.nid
     ) ?? false
 
-  // Find the program using it's NID
-  const program = foundSearchableProgram
-    ? foundSearchableProgram
-    : allPrograms.find((program) => program.nid.toString() === req.params.nid)
+  // Find the program using it's NID - Use searchable program data first, if possible, because it has known keywords and groups.
+  const program =
+    foundSearchableProgram ??
+    allPrograms.find((program) => program.nid.toString() === req.params.nid)
 
   // Extract NOC searchable keywords (searched using the search() helper function)
-  const nocKeywords = program.noc_search_keywords
-    ? program.noc_search_keywords
-    : false
+  const knownKeywords = program.noc_search_keywords ?? false
 
   // Extract all known NOC unit groups - this is an array of NOC unit group numbers as strings.
-  const knownGroups = program.known_noc_groups
-    ? program.known_noc_groups
-    : false
+  const knownGroups = program.known_noc_groups ?? false
 
-  // Collector Arrays
+  // Collector Array
   const jobResults = []
 
-  // Only attempt to search if we have keywords to search with
-  if (nocKeywords) {
+  // Collecting Jobs From Known Keywords - If Any
+  if (knownKeywords) {
     const credential = program.credential
     const keywords = {
       credential: [...ensureArray(credential)],
-      search: [...ensureArray(nocKeywords)],
+      search: [...ensureArray(knownKeywords)],
     }
     const results = search(keywords)
-    results.jobs.forEach((result) => pushIfUnique(jobResults, result))
+    results.forEach((result) => pushIfUnique(jobResults, result))
   }
 
-  // Only add known unit groups if the program we're referencing has any
+  // Collecting Jobs From Known Groups - If Any
   if (knownGroups) {
     knownGroups.forEach((knownGroup) => {
       // Search for a matching unit group using the NOC unit group number
@@ -91,11 +86,10 @@ exports.jobsByProgram = function (req, res) {
     })
   }
 
-  // Form response and send.
-  const results = {
-    jobs: jobResults,
-  }
-  res.send(results)
+  // TODO - Add the ability to search organically for jobs.
+
+  if (jobResults.length > 0) res.json(jobResults)
+  else res.send('No jobs found for this program')
 }
 
 /**
@@ -106,32 +100,40 @@ exports.jobsByProgram = function (req, res) {
 exports.getJobs = (req, res) => {
   const noc = req.params.noc
   if (noc) {
-    const result = unitGroups.find((group) => group.noc === noc)
-    if (result) res.json(result.jobs)
+    const { jobs } = unitGroups.find((group) => group.noc === noc)
+    if (jobs) res.json(jobs)
   }
   res.status(500).send('Something went wrong')
-}
+} // MOTHBALL August 12, 2022
 
 /**
  * Get a list of jobs related to a given NID, including the employment outlook in BC.
  */
 exports.getJobsAndOutlook = async (req, res) => {
+  // Type validation on NID.
+  const NID = Number(req.params.nid) ?? false
+  if (!NID)
+    return res
+      .status(500)
+      .send(
+        `There was an issue with the NID provided to getJobsAndOutlook(). Must be a valid NID. Must be a number, or string that can be cast to a number. Received: ${req.params.nid}`
+      )
+
   // Find the program using it's NID
-  const result = await getProgram(req.params.nid)
-  const program = result?.result
-  const error = result?.error
-  if (error) {
-    return res.status(500).send(error)
+  const { result, error } = await getProgram(NID)
+  const program = result
+  if (error || !program) {
+    return res.status(500).send(error ?? `No programs found for NID ${NID}`)
   }
 
   // Extract NOC searchable keywords (searched using the search() helper function)
   const nocKeywords = searchablePrograms.find(
-    (program) => Number(program.nid) === Number(req.params.nid)
+    (program) => program.nid == NID
   )?.noc_search_keywords
 
   // Extract all known NOC unit groups - this is an array of NOC unit group numbers as strings.
   const knownGroups = searchablePrograms.find(
-    (program) => Number(program.nid) === Number(req.params.nid)
+    (program) => program.nid == NID
   )?.known_noc_groups
 
   // Collector Array
@@ -155,7 +157,7 @@ exports.getJobsAndOutlook = async (req, res) => {
 
   // Also add unit group NOC's from the knownGroups if the program we're searching for has any
   if (knownGroups) {
-    const jobs = extractJobs(knownGroups)
+    const jobs = findJobsForUnitGroups(knownGroups)
     jobs.forEach((job) => {
       pushIfUnique(jobResults, job)
     })
@@ -190,7 +192,7 @@ exports.getJobsAndOutlook = async (req, res) => {
         jobs: [],
         message:
           'This program NID does not have nocKeywords or knownGroups properties. This makes it very hard to search for. consider adding one or both of these properties to the program.' +
-          `(nid: ${req.params.nid})`,
+          `(nid: ${NID})`,
       })
     }
   }

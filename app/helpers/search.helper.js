@@ -101,19 +101,14 @@ module.exports = ({ credential, search: searchTerms }) => {
     }
   }
 
-  // Collector
-  const results = {
-    jobs: [],
-  }
-
   // At this point, if we have no group results, we can return our empty array.
   if (!(groupResults.length >= 0)) {
     console.log('return with no found results')
     return { error: 'No results found.' }
   }
 
+  // Otherwise, start collecting jobs and respond with the results.
   const jobs = []
-
   for (const group of groupResults) {
     const noc = group.noc
     const listOfJobs = group.jobs
@@ -122,7 +117,5 @@ module.exports = ({ credential, search: searchTerms }) => {
     })
   }
 
-  results.jobs = jobs
-
-  return results
+  return jobs
 }

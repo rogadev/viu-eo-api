@@ -18,8 +18,9 @@ const getPrograms = async () => {
  * @returns {Object} - The program object. Contains 'program' or 'error' properties.
  */
 const getProgram = async (programNID) => {
-  // Parameter type protection
+  // Type protection for the NID parameter.
   const nid = Number.parseInt(programNID)
+  console.log(nid)
 
   // Fetch the list of programs from VIU
   const response = await getPrograms()
