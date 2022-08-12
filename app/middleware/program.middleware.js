@@ -2,13 +2,24 @@
  * Checks that nid exists in params. Validates that nid is a number. Works for both program and area nid's.
  */
 exports.requiresNidParam = function (req, res, next) {
+  console.log(
+    'Requires NID Parameter Middleware Run',
+    `nid = ${req.params.nid}`
+  )
+  const messages = []
   if (!req.params.nid) {
-    return res.status(400).send('Missing nid parameter')
+    messages.push('Missing nid parameter')
   }
   if (!Number.isInteger(Number.parseInt(req.params.nid))) {
-    return res.status(400).send('Invalid nid parameter (format)')
+    messages.push('Invalid nid parameter (format)')
   }
-  next()
+  if (!messages.length) return next()
+
+  res.status(400).send({
+    error: {
+      message: messages.join('\n'),
+    },
+  })
 }
 
 /**

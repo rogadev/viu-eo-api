@@ -18,57 +18,108 @@ const numberify = (n) => Number.parseInt(n)
 exports.findOne = function (req, res) {
   const nid = numberify(req.params.nid)
   const program = searchablePrograms.find((program) => program.nid === nid)
-  if (program) {
-    res.json(program)
-  } else {
-    res
-      .status(404)
-      .send(
-        'That program exists, but is not searchable by the VIU career outlooks API.'
-      )
+  if (!program) {
+    return res.status(204).send()
   }
+  return res.status(200).send({
+    data: program,
+    message: 'Program found',
+  })
 }
 
 /**
  * Find area based on its NID
  */
 exports.findArea = function (req, res) {
-  const nid = req.params.nid
+  /** @type {number} */
+  const nid = Number.parseInt(req.params.nid)
+
+  if (!nid || typeof nid !== 'number') {
+    return res.status(400).send({
+      error: `Request parameter 'nid' was not provided or is not valid. Parameter provided: ${nid}`,
+    })
+  }
+
   const area = programAreas.find(
     (area) => numberify(area.nid) === numberify(nid)
   )
-  if (area) {
-    res.json(area)
-  } else {
-    res.status(404).send('Not found')
+
+  if (!area) {
+    return res.status(204).send()
   }
+
+  res.status(200).send({
+    data: area,
+    message: 'Area found',
+  })
 }
 
 /**
  * Returns list of all searchable programs
  */
 exports.findSearchable = function (req, res) {
-  res.json(searchablePrograms)
+  res
+    .status(200)
+    .send({ data: searchablePrograms, message: 'Searchable programs found' })
 }
 
 /**
  * Return list of all programs offered at VIU, searchable or otherwise.
  */
-exports.findAll = function (req, res) {
-  res.json(allPrograms)
+exports.findAll = async function (req, res) {
+  try {
+    const result = await fetch('https://www.viu.ca/program-export-emp-json')
+    const programs = await result.json()
+    if (!programs) {
+      return res.status(204).send({
+        message: 'No programs found',
+        data: {},
+      })
+    }
+    res.status(200).send({
+      data: programs,
+      message: 'Programs found',
+    })
+  } catch (errors) {
+    res.status(500).send({ error: errors })
+  }
 }
 
 /**
  * Return area based on program NID
  */
-exports.findAreaByProgram = function (req, res) {
-  const programNid = req.params.nid
-  const area = programAreas.find(
-    (area) => numberify(area.nid) === numberify(programNid)
-  )
-  if (area) {
-    res.json(area)
-  } else {
-    res.status(404).send('Not found')
+exports.findAreaByProgram = async function (req, res) {
+  console.log('findAreaByProgram', req.params.nid)
+  const programNid = Number.parseInt(req.params.nid)
+
+  if (!programNid || typeof programNid !== 'number') {
+    return res.status(400).send({
+      error: {
+        message: `Request parameter 'nid' was not provided or is not valid. Parameter provided: ${programNid}`,
+      },
+    })
+  }
+
+  try {
+    const result = await fetch('https://www.viu.ca/program-export-emp-json')
+    const programs = await result.json()
+
+    const program = programs.find((program) => program.nid == programNid)
+    const areaNid = program.program_area
+    const area = programAreas.find(({ nid }) => nid == areaNid)
+
+    if (!area) {
+      return res.status(204).send({
+        message: 'No area found',
+        data: {},
+      })
+    }
+
+    res.status(200).send({
+      data: area,
+      message: 'Area found',
+    })
+  } catch (errors) {
+    res.status(500).send({ error: errors })
   }
 }

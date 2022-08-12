@@ -13,7 +13,6 @@ const MainRouter = require('./app/routes')
 const cors = require('cors')
 App.use(express.json())
 App.use(cors())
-// TODO may need to fix this. Still blocking cross-origin requests.
 
 // FALLBACK ROUTE
 App.get('/', (req, res) =>
