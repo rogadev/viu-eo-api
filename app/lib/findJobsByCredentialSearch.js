@@ -6,7 +6,7 @@ const { titleCase } = require('../helpers/string.helpers.js')
 const allUnitGroups = require('../data/noc/2016/noc_2016_unit_groups.json')
 
 /**
- * Using credential and search keywords, searches for matching NOC unit groups, based on requirements, and returns the results.
+ * Expands the "credential" keywords. Combines credential keywords and search kewords. Searches Stats Canada's NOC data for jobs that match the expanded keywords to job requirements fields. These resulting unit groups jobs are maped out and returned in the results. Returns an error property if encountered.
  * @param {{credential: string[], searchKeywords: string[]}} keywords - An object containing credential keywords and search keywords.
  * @returns an array of job objects related to this search. If no jobs are found, returns an empty array.
  */

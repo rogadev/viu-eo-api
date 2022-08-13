@@ -124,10 +124,12 @@ exports.getJobsAndOutlook = async (req, res) => {
   if (error || !program) {
     return res.status(400).send({
       error: {
-        message: `Could not find a program with nid ${NID}. Check your request and try again.`,
+        message: `Could not find a program with nid "${NID}". Check your request and try again.`,
       },
     })
   }
+
+  // NOTE: known keywords and known groups are found on the "searchable" list of VIU programs. Not all programs on the VIU program list will return resutls and not all programs will have known keywords and groups added to them. In the future, it would be advisable to port over these properties from the hard-coded searchable programs list and add them to the program list that we can fetch from VIU data, directly.
 
   // Extract NOC searchable keywords (searched using the search() helper function)
   /** @type {string[]} */
