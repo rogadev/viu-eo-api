@@ -9,9 +9,10 @@ const viuCacheTTL = 60 * 60 * 24 // 1 day
 const viuProgramsCache = new NodeCache({ stdTTL: viuCacheTTL })
 
 // OUTLOOK CACHES
-const outlookCacheTTL = 60 * 60 * 24 * 30 * 3 // 3 month time to live
-const nationalOutlooksCache = new NodeCache({ stdTTL: outlookCacheTTL })
-const provincialOutlooksCache = new NodeCache({ stdTTL: outlookCacheTTL })
+// TODO implement these other caches
+// const outlookCacheTTL = 60 * 60 * 24 * 30 * 3 // 3 month time to live
+// const nationalOutlooksCache = new NodeCache({ stdTTL: outlookCacheTTL })
+// const provincialOutlooksCache = new NodeCache({ stdTTL: outlookCacheTTL })
 
 // CACHE FUNCTION
 
