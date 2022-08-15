@@ -90,8 +90,12 @@ exports.bcProvincialOutlook = async function (req, res) {
   try {
     let outlook = provincialOutlooksCache.get(`${noc}-${prov}`)
     if (!outlook) {
-      const apiResponse = await fetchProvincialOutlook(noc, prov) // note: fetches provincial outlook from LMI-EO API
-      outlook = await apiResponse.json() // note: because it's not from our API, the response is handled differently
+      const apiResponse = await fetchProvincialOutlook(noc, prov)
+      outlook = await apiResponse.json()
+      if (!outlook)
+        throw new Error(
+          'No provincial outlook found after fetching form Government of Canada LMI-EO API.'
+        )
       provincialOutlooksCache.set(`${noc}-${prov}`, outlook)
     }
     res.status(200).send({ data: refactorOutlookWithLogicalPotential(outlook) })

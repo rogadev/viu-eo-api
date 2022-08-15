@@ -84,10 +84,19 @@ const fetchNationalOutlook = async (noc) => {
  */
 const fetchProvincialOutlook = async (noc, provinceId) => {
   // example query: GET https://lmi-outlooks-esdc-edsc-apicast-production.api.canada.ca/clmix-wsx/gcapis/outlooks?noc=1111&rtp=1&rid=10
-  return await fetch(
-    `https://lmi-outlooks-esdc-edsc-apicast-production.api.canada.ca/clmix-wsx/gcapis/outlooks?noc=${noc}&rtp=1&rid=${provinceId}&lang=en`,
-    { headers: headers }
-  )
+
+  try {
+    console.log('entered')
+    const response = await fetch(
+      `https://lmi-outlooks-esdc-edsc-apicast-production.api.canada.ca/clmix-wsx/gcapis/outlooks?noc=${noc}&rtp=1&rid=${provinceId}&lang=en`,
+      { headers: headers }
+    )
+    const { data } = await response.json()
+    console.log('data', data)
+    return data
+  } catch (e) {
+    console.log(e)
+  }
 }
 
 /**
