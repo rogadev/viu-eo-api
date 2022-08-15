@@ -97,7 +97,7 @@ exports.jobsByProgram = async function (req, res) {
   }
 
   if (!jobResults.length) {
-    return res.status(204).send({ data: {}, message: 'No jobs found' })
+    return res.status(204).send({ data: [], message: 'No jobs found' })
   }
 
   res.status(200).send({ data: jobResults, message: 'Jobs found.' })
@@ -120,7 +120,7 @@ exports.getJobs = (req, res) => {
     }
   }
   if (!jobs.length) {
-    return res.status(204).send({ data: {}, message: 'No jobs found' })
+    return res.status(204).send({ data: [], message: 'No jobs found' })
   }
   return res.status(200).send({ data: jobs, message: 'Jobs found.' })
 } // MOTHBALL August 12, 2022
