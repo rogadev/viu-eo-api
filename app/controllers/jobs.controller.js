@@ -19,6 +19,7 @@ const { titleCase } = require('../helpers/string.helpers')
  * Controller for retrieving a list of jobs by program search.
  */
 exports.jobsByProgram = async function (req, res) {
+  console.log('jobsByProgram', req.params.nid)
   const searchedNid = req.params.nid
 
   // Check the searchable programs, first. We have some hard coded data, there.
@@ -29,10 +30,14 @@ exports.jobsByProgram = async function (req, res) {
   // Find the program using it's NID - Use searchable program data first, if possible, because it has known keywords and groups.
   const program = await (async () => {
     if (foundSearchableProgram) {
+      console.log('foundSearchableProgram', foundSearchableProgram)
       return foundSearchableProgram
     }
     const allPrograms = await getViuPrograms()
-    return allPrograms.find(({ nid }) => nid == searchedNid)
+    console.log('allPrograms', allPrograms)
+    const foundProgram = allPrograms.find(({ nid }) => nid == searchedNid)
+    console.log('foundProgram', foundProgram)
+    return foundProgram
   })()
 
   // If there is no program, return a 404.
@@ -61,7 +66,6 @@ exports.jobsByProgram = async function (req, res) {
     const results = findJobsByCredentialSearch(keywords)
     results.forEach((result) => pushIfUnique(jobResults, result))
   }
-  console.log('past known keywords', jobResults)
 
   // Collecting Jobs From Known Groups - If Any
   if (knownGroups) {
@@ -80,16 +84,15 @@ exports.jobsByProgram = async function (req, res) {
       }
     })
   }
-  console.log('past known groups', jobResults)
 
   // Lastly, do an organic search on the program using it's title and credential properties.
   const programKeywords = {
     credential: [...ensureArray(credential)],
     searchKeywords: [...ensureArray(title)],
   }
-  console.log('program keywords', programKeywords)
+
   const organicSearchResults = findJobsByCredentialSearch(programKeywords)
-  console.log('past organic search', organicSearchResults)
+
   if (organicSearchResults.length) {
     organicSearchResults.forEach((organicSearchResult) =>
       pushIfUnique(jobResults, organicSearchResult)
