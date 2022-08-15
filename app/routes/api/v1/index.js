@@ -10,6 +10,7 @@ const test = require('../../../controllers/test.controller.js')
 const programs = require('../../../controllers/program.controller.js')
 const jobs = require('../../../controllers/jobs.controller.js')
 const fix = require('../../../controllers/fix.controller.js')
+const getJobsByCredentialSearch = require('../../../controllers/jobs/getJobsByCredentialSearch.js')
 
 // GET /api/v1/test - Test route.
 router.get('/test', test.test)
@@ -24,19 +25,19 @@ router.get(
   programs.findArea
 )
 
+// GET /api/v1/programs/area/:nid - Returns area based on program NID.
+router.get(
+  '/program/area/:nid',
+  programMW.requiresNidParam,
+  programs.findAreaByProgram
+)
+
 // GET /api/v1/programs/:nid - Returns program based on its NID.
 router.get(
   '/program/:nid',
   programMW.requiresNidParam,
   programMW.validateProgramNidParam,
   programs.findOne
-)
-
-// GET /api/v1/programs/area/:nid - Returns area based on program NID.
-router.get(
-  '/program/area/:nid',
-  programMW.requiresNidParam,
-  programs.findAreaByProgram
 )
 
 // GET /api/v1/programs - Returns list of all programs offered at VIU.
@@ -59,7 +60,7 @@ router.get(
 router.get(
   '/jobs-by-credential',
   jobsMW.requiresCredentialQuery,
-  jobs.jobsByCredential
+  getJobsByCredentialSearch
 )
 
 // NESTED ROUTES

@@ -16,7 +16,6 @@ const {
 } = require('../helpers/outlook.helpers.js')
 
 // CONTROLLER FUNCTIONS
-// TODO - extract controller functions into helper functions.
 
 /**
  * Used to query the LMI Employment Outlook API for nation-wide outlooks for a given NOC unit group code. LMI-EO uses NOC 2016 v1.3.
@@ -27,6 +26,14 @@ const {
  */
 exports.nationalOutlook = async function (req, res) {
   const noc = req.params.noc
+
+  if (!noc || typeof noc !== 'string') {
+    return res.status(400).send({
+      data: {},
+      message: `Request parameter 'noc' was not provided or is not valid - ${noc}`,
+    })
+  }
+
   try {
     let outlook = nationalOutlooksCache.get(noc)
     if (!outlook) {
@@ -34,10 +41,13 @@ exports.nationalOutlook = async function (req, res) {
       outlook = await apiResponse.json()
       nationalOutlooksCache.set(noc, outlook)
     }
-    res.send(outlook)
+    return res.status(200).send({
+      data: outlook,
+      message: 'National outlook found.',
+    })
   } catch (e) {
     console.error(e)
-    res.status(e.status ?? 500).send(e)
+    res.status(e.status ?? 500).send({ error: e })
   }
 }
 

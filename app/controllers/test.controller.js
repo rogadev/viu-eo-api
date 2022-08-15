@@ -2,5 +2,7 @@
  * Basic test route.
  */
 exports.test = (_, res) => {
-  res.send('Hello World!')
+  res.status(200).send({
+    message: 'Test route successful.',
+  })
 }

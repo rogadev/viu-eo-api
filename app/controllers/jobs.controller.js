@@ -1,72 +1,67 @@
 // DATA
 const unitGroups = require('../data/noc/2016/noc_2016_unit_groups.json')
-const allPrograms = require('../data/viu/all_programs.json')
 const searchablePrograms = require('../data/viu/searchable_programs.json') // NOTE: Only using searchable programs. Not all programs will return results.
 const { getProgram } = require('../helpers/viu_data.helpers.js')
 
+// STORES
+const getViuPrograms = require('../stores')
+
 // HELPERS
-const search = require('../helpers/search.helper.js')
+const findJobsByCredentialSearch = require('../lib/findJobsByCredentialSearch.js')
 const { pushIfUnique, ensureArray } = require('../helpers/array.helpers.js')
-const findJobsForUnitGroups = require('../helpers/extract_jobs.helper.js')
+const extractJobsFromUnitGroups = require('../lib/extractJobsFromNocUnitGroups.js')
 const { getOutlook } = require('../helpers/outlook.helpers.js')
 const { titleCase } = require('../helpers/string.helpers')
 
 // CONTROLLER FUNCTIONS
 
 /**
- * Receives credential keywords and search keywords, uses them to find NOC unit groups that match the keywords/requirements.
- * @returns An object containing jobs and groups, relevant to the given search.
+ * Controller for retrieving a list of jobs by program search.
  */
-exports.jobsByCredential = function (req, res) {
-  // Required keywords format for search() helper function
-  const keywords = {
-    credential: [...ensureArray(req.query.credential)],
-    search: [...ensureArray(req.query.keywords)],
-  }
-  // Search the data for matching unit groups
-  const result = search(keywords)
-  // If result returns with an error property, send error.
-  if (result.error) res.status(500).send(result.error)
-  // If no error, send the results.
-  else res.send(result)
-} // WORKING August 12, 2022
+exports.jobsByProgram = async function (req, res) {
+  const searchedNid = req.params.nid
 
-/**
- * Receives a program NID as a parameter, uses the NID to extrapolate credential keywords and search keywords. Queries
- * jobs-by-credential and returns the resulting object.
- * @returns An object containing jobs and groups, relevant to the given search.
- */
-exports.jobsByProgram = function (req, res) {
   // Check the searchable programs, first. We have some hard coded data, there.
-  const foundSearchableProgram =
-    searchablePrograms.find(
-      (program) => program.nid.toString() === req.params.nid
-    ) ?? false
+  const foundSearchableProgram = searchablePrograms.find(
+    ({ nid }) => nid == searchedNid // string to number comparison
+  )
 
   // Find the program using it's NID - Use searchable program data first, if possible, because it has known keywords and groups.
-  const program =
-    foundSearchableProgram ??
-    allPrograms.find((program) => program.nid.toString() === req.params.nid)
+  const program = await (async () => {
+    if (foundSearchableProgram) {
+      return foundSearchableProgram
+    }
+    const allPrograms = await getViuPrograms()
+    return allPrograms.find(({ nid }) => nid == searchedNid)
+  })()
+
+  // If there is no program, return a 404.
+  if (!program) {
+    return res.status(404).send(`No program found with NID ${req.params.nid}`)
+  }
+
+  const { nid, title, noc_search_keywords, known_noc_groups, credential } =
+    program
 
   // Extract NOC searchable keywords (searched using the search() helper function)
-  const knownKeywords = program.noc_search_keywords ?? false
+  const knownKeywords = noc_search_keywords
 
   // Extract all known NOC unit groups - this is an array of NOC unit group numbers as strings.
-  const knownGroups = program.known_noc_groups ?? false
+  const knownGroups = known_noc_groups
 
   // Collector Array
   const jobResults = []
 
   // Collecting Jobs From Known Keywords - If Any
   if (knownKeywords) {
-    const credential = program.credential
     const keywords = {
       credential: [...ensureArray(credential)],
-      search: [...ensureArray(knownKeywords)],
+      searchKeywords: [...ensureArray(knownKeywords)],
     }
-    const results = search(keywords)
+    const results = findJobsByCredentialSearch(keywords)
     results.forEach((result) => pushIfUnique(jobResults, result))
   }
+  console.log('past known keywords', jobResults)
 
   // Collecting Jobs From Known Groups - If Any
   if (knownGroups) {
@@ -85,11 +80,27 @@ exports.jobsByProgram = function (req, res) {
       }
     })
   }
+  console.log('past known groups', jobResults)
 
-  // TODO - Add the ability to search organically for jobs.
+  // Lastly, do an organic search on the program using it's title and credential properties.
+  const programKeywords = {
+    credential: [...ensureArray(credential)],
+    searchKeywords: [...ensureArray(title)],
+  }
+  console.log('program keywords', programKeywords)
+  const organicSearchResults = findJobsByCredentialSearch(programKeywords)
+  console.log('past organic search', organicSearchResults)
+  if (organicSearchResults.length) {
+    organicSearchResults.forEach((organicSearchResult) =>
+      pushIfUnique(jobResults, organicSearchResult)
+    )
+  }
 
-  if (jobResults.length > 0) res.json(jobResults)
-  else res.send('No jobs found for this program')
+  if (!jobResults.length) {
+    return res.status(204).send({ data: {}, message: 'No jobs found' })
+  }
+
+  res.status(200).send({ data: jobResults, message: 'Jobs found.' })
 }
 
 /**
@@ -99,73 +110,91 @@ exports.jobsByProgram = function (req, res) {
  */
 exports.getJobs = (req, res) => {
   const noc = req.params.noc
+  const jobs = []
   if (noc) {
     const { jobs } = unitGroups.find((group) => group.noc === noc)
-    if (jobs) res.json(jobs)
+    if (jobs) {
+      jobs.forEach((job) => {
+        pushIfUnique(jobs, { noc, title: titleCase(job) })
+      })
+    }
   }
-  res.status(500).send('Something went wrong')
+  if (!jobs.length) {
+    return res.status(204).send({ data: {}, message: 'No jobs found' })
+  }
+  return res.status(200).send({ data: jobs, message: 'Jobs found.' })
 } // MOTHBALL August 12, 2022
 
 /**
  * Get a list of jobs related to a given NID, including the employment outlook in BC.
  */
 exports.getJobsAndOutlook = async (req, res) => {
-  // Type validation on NID.
+  // I opted not to do middleware for this route - this is our parameter checking and error handling
   const NID = Number(req.params.nid) ?? false
   if (!NID)
-    return res
-      .status(500)
-      .send(
-        `There was an issue with the NID provided to getJobsAndOutlook(). Must be a valid NID. Must be a number, or string that can be cast to a number. Received: ${req.params.nid}`
-      )
+    return res.status(400).send({
+      error: {
+        message:
+          'NID is required and must be a number or string that can be converted to a number.',
+      },
+    })
 
   // Find the program using it's NID
-  const { result, error } = await getProgram(NID)
-  const program = result
+  const { result: program, error } = await getProgram(NID)
   if (error || !program) {
-    return res.status(500).send(error ?? `No programs found for NID ${NID}`)
+    return res.status(400).send({
+      error: {
+        message: `Could not find a program with nid "${NID}". Check your request and try again.`,
+      },
+    })
   }
 
+  // NOTE: known keywords and known groups are found on the "searchable" list of VIU programs. Not all programs on the VIU program list will return resutls and not all programs will have known keywords and groups added to them. In the future, it would be advisable to port over these properties from the hard-coded searchable programs list and add them to the program list that we can fetch from VIU data, directly.
+
   // Extract NOC searchable keywords (searched using the search() helper function)
-  const nocKeywords = searchablePrograms.find(
-    (program) => program.nid == NID
+  /** @type {string[]} */
+  const knownKeywords = searchablePrograms.find(
+    (program) => program.nid == NID // using equality operator over exact equality operator for loose checking.
   )?.noc_search_keywords
 
   // Extract all known NOC unit groups - this is an array of NOC unit group numbers as strings.
+  /** @type {string[]} */
   const knownGroups = searchablePrograms.find(
-    (program) => program.nid == NID
+    (program) => program.nid == NID // using equality operator over exact equality operator for loose checking.
   )?.known_noc_groups
 
   // Collector Array
+  /** @type {Array<{noc: number, title: string}>} */
   const jobResults = []
 
   // Only attempt to search if we have keywords to search with
-  if (nocKeywords) {
-    const credential = program.credential // TODO We used to be upgrading our credential to account for more variations that we sometimes find in the data. Ex. "certificate" might be "red seal" or "apprenticeship program" or "trades school".
+  if (knownKeywords) {
+    const credential = program.credential
     const keywords = {
       credential: [...ensureArray(credential)],
-      search: [...ensureArray(nocKeywords)],
+      searchKeywords: [...ensureArray(knownKeywords)],
     }
-    const results = search(keywords)
-    if (!results.jobs) {
+    /** @type {{noc: number, title: string}} */
+    const results = findJobsByCredentialSearch(keywords)
+    if (!results.length) {
       return
     }
-    results.jobs.forEach((result) => {
+    results.forEach((result) => {
       pushIfUnique(jobResults, result)
     })
   }
 
   // Also add unit group NOC's from the knownGroups if the program we're searching for has any
   if (knownGroups) {
-    const jobs = findJobsForUnitGroups(knownGroups)
-    jobs.forEach((job) => {
+    const results = extractJobsFromUnitGroups(knownGroups)
+    results.forEach((job) => {
       pushIfUnique(jobResults, job)
     })
   }
 
   // If we don't have either nocKeywords or knownGroups, we'll have to guess what to search for. This won't be the best outcome.
-  if (!nocKeywords && !knownGroups) {
-    const credential = program.credential // TODO We used to be expand our credential keywords to include a wide range of variations that we sometimes find in the data. Ex. "certificate" might be "red seal" or "apprenticeship program" or "trades school".
+  if (!knownKeywords && !knownGroups) {
+    const credential = program.credential
     let programTitle = program?.title
     if (programTitle) programTitle = programTitle.trim()
     let programKeywords = program?.field_viu_search_keywords
@@ -177,7 +206,7 @@ exports.getJobsAndOutlook = async (req, res) => {
       credential: [...ensureArray(credential)],
       search: [...ensureArray(searchkeywords)],
     }
-    const results = search(keywords)
+    const results = findJobsByCredentialSearch(keywords)
     results.jobs.forEach((result) => {
       const noc = result.noc
       const jobs = result.jobs
@@ -187,9 +216,9 @@ exports.getJobsAndOutlook = async (req, res) => {
     })
 
     // We return 204 No Content if we don't find any jobs, adding a message prop for debugging purposes. This message should clearly describe what to do to render search results.
-    if (jobResults.length === 0) {
+    if (!jobResults.length) {
       return res.status(204).json({
-        jobs: [],
+        data: {},
         message:
           'This program NID does not have nocKeywords or knownGroups properties. This makes it very hard to search for. consider adding one or both of these properties to the program.' +
           `(nid: ${NID})`,
@@ -227,7 +256,8 @@ exports.getJobsAndOutlook = async (req, res) => {
     }
     finalResults.push(result)
   })
-  res.send({
-    jobs: finalResults,
+  res.status(200).send({
+    data: finalResults,
+    message: 'Jobs found.',
   })
 }
