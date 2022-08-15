@@ -1,3 +1,5 @@
+const { getViuPrograms } = require('../stores')
+
 /**
  * Checks for 'credential' and 'keywords' query params. If either is missing, returns 400.
  * @query {Array<String>} credential - Credential keywords to search for.
@@ -17,28 +19,17 @@ exports.requiresCredentialQuery = function (req, res, next) {
  * @param {String} nid - NID to verify.
  */
 exports.requiresProgramNidParam = function (req, res, next) {
+  const messages = []
+
   if (!req.params.nid) {
-    return res.status(400).send('Missing nid parameter')
-  }
-  if (!Number.isInteger(Number.parseInt(req.params.nid))) {
-    return res.status(400).send('Invalid nid parameter (format)')
-  }
-  const programs = require('../data/viu/all_programs.json')
-  const validNids = programs.map((program) => program.nid)
-  if (!validNids.includes(req.params.nid)) {
-    return res.status(400).send('Invalid nid parameter (value)')
-  } else {
-    const searchablePrograms = require('../data/viu/searchable_programs.json')
-    const searchableNids = searchablePrograms.map((program) =>
-      program.nid.toString()
+    messages.push(
+      'NID is required and must be a number or string that can be converted to a number.'
     )
-    if (!searchableNids.includes(req.params.nid)) {
-      return res
-        .status(400)
-        .send(
-          'This program exists but renders no results when searching for related NOC unit groups.'
-        )
-    }
   }
+
+  if (messages.length) {
+    return res.status(400).send(messages)
+  }
+
   next()
 }
