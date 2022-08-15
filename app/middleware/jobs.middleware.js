@@ -28,7 +28,7 @@ exports.requiresProgramNidParam = function (req, res, next) {
   }
 
   if (messages.length) {
-    return res.status(400).send(messages)
+    return res.status(204).send({ data: [], message: messages.join(' ') })
   }
 
   next()
