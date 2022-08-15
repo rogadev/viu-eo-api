@@ -89,8 +89,7 @@ exports.bcProvincialOutlook = async function (req, res) {
       outlook = await apiResponse.json()
       provincialOutlooksCache.set(`${noc}-${prov}`, outlook)
     }
-    console.log(outlook.noc, outlook.trends)
-    res.send(refactorOutlookWithLogicalPotential(outlook))
+    res.status(200).send({ data: refactorOutlookWithLogicalPotential(outlook) })
   } catch (e) {
     console.error(e)
     res.status(e.status ?? 500).send(e)
