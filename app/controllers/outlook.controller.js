@@ -86,7 +86,9 @@ exports.bcProvincialOutlook = async function (req, res) {
     let outlook = provincialOutlooksCache.get(`${noc}-${prov}`)
     if (!outlook) {
       const apiResponse = await fetchProvincialOutlook(noc, prov)
-      outlook = await apiResponse.json()
+      const { data } = await apiResponse.json()
+      outlook = data
+
       provincialOutlooksCache.set(`${noc}-${prov}`, outlook)
     }
     console.log(outlook.noc, outlook.trends)
