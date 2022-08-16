@@ -16,7 +16,6 @@ const getOutlook = async (noc) => {
   try {
     let outlook = outlooksCache.get(noc)
     if (!outlook) {
-      console.log(`Not cached - fetching outlook for ${noc}`)
       const response = await fetch(
         `https://lmi-outlooks-esdc-edsc-apicast-production.api.canada.ca/clmix-wsx/gcapis/outlooks?noc=1111&rtp=1&rid=59&lang=en`,
         {
@@ -25,8 +24,6 @@ const getOutlook = async (noc) => {
       )
       outlook = await response.json()
       outlooksCache.set(noc, outlook)
-    } else {
-      console.log(`Using cached outlook for ${noc}`)
     }
     outlook = refactorOutlookWithLogicalPotential(outlook)
     return outlook
@@ -86,16 +83,14 @@ const fetchProvincialOutlook = async (noc, provinceId) => {
   // example query: GET https://lmi-outlooks-esdc-edsc-apicast-production.api.canada.ca/clmix-wsx/gcapis/outlooks?noc=1111&rtp=1&rid=10
 
   try {
-    console.log('entered')
     const response = await fetch(
       `https://lmi-outlooks-esdc-edsc-apicast-production.api.canada.ca/clmix-wsx/gcapis/outlooks?noc=${noc}&rtp=1&rid=${provinceId}&lang=en`,
       { headers: headers }
     )
-    const { data } = await response.json()
-    console.log('data', data)
+    const data = await response.json()
     return data
   } catch (e) {
-    console.log(e)
+    console.error(e)
   }
 }
 
