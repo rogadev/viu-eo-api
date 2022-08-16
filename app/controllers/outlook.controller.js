@@ -3,6 +3,7 @@ const NodeCache = require('node-cache')
 const ttl = 60 * 60 * 24 * 30 * 3 // 3 month time to live
 const nationalOutlooksCache = new NodeCache({ stdTTL: ttl })
 const provincialOutlooksCache = new NodeCache({ stdTTL: ttl })
+// TODO Extract caches into a separate module.
 
 // FETCH HEADER - API KEY
 const headers = new Headers()
@@ -90,17 +91,18 @@ exports.bcProvincialOutlook = async function (req, res) {
   try {
     let outlook = provincialOutlooksCache.get(`${noc}-${prov}`)
     if (!outlook) {
-      const apiResponse = await fetchProvincialOutlook(noc, prov)
-      outlook = await apiResponse.json()
-      if (!outlook)
-        throw new Error(
-          'No provincial outlook found after fetching form Government of Canada LMI-EO API.'
-        )
-      provincialOutlooksCache.set(`${noc}-${prov}`, outlook)
+      outlook = await fetchProvincialOutlook(noc, prov)
     }
-    res.status(200).send({ data: refactorOutlookWithLogicalPotential(outlook) })
+    if (!outlook)
+      throw new Error(
+        'No provincial outlook found after fetching form Government of Canada LMI-EO API.'
+      )
+    provincialOutlooksCache.set(`${noc}-${prov}`, outlook)
+    return res
+      .status(200)
+      .send({ data: refactorOutlookWithLogicalPotential(outlook) })
   } catch (e) {
     console.error(e)
-    res.status(e.status ?? 500).send(e)
+    return res.status(e.status ?? 500).send(e)
   }
 }
