@@ -4,7 +4,7 @@ const searchablePrograms = require('../data/viu/searchable_programs.json') // NO
 const { getProgram } = require('../helpers/viu_data.helpers.js')
 
 // STORES
-const getViuPrograms = require('../stores')
+const { getViuPrograms } = require('../stores')
 
 // HELPERS
 const findJobsByCredentialSearch = require('../lib/findJobsByCredentialSearch.js')
@@ -23,30 +23,23 @@ exports.jobsByProgram = async function (req, res) {
   const searchedNid = req.params.nid
 
   // Check the searchable programs, first. We have some hard coded data, there.
-  const foundSearchableProgram = searchablePrograms.find(
+  const program = searchablePrograms.find(
     ({ nid }) => nid == searchedNid // string to number comparison
   )
 
-  // Find the program using it's NID - Use searchable program data first, if possible, because it has known keywords and groups.
-  const program = await (async () => {
-    if (foundSearchableProgram) {
-      console.log('foundSearchableProgram', foundSearchableProgram)
-      return foundSearchableProgram
-    }
-    const allPrograms = await getViuPrograms()
-    console.log('allPrograms', allPrograms)
-    const foundProgram = allPrograms.find(({ nid }) => nid == searchedNid)
-    console.log('foundProgram', foundProgram)
-    return foundProgram
-  })()
-
   // If there is no program, return a 404.
   if (!program) {
-    return res.status(404).send(`No program found with NID ${req.params.nid}`)
+    return res.status(204).send({ data: [], message: 'No jobs found' })
   }
 
-  const { nid, title, noc_search_keywords, known_noc_groups, credential } =
-    program
+  const {
+    nid,
+    title,
+    noc_search_keywords,
+    known_noc_groups,
+    credential,
+    field_viu_search_keywords,
+  } = program
 
   // Extract NOC searchable keywords (searched using the search() helper function)
   const knownKeywords = noc_search_keywords

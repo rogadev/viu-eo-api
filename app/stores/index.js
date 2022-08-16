@@ -27,7 +27,7 @@ exports.getViuPrograms = async () => {
   }
   try {
     const { results } = await getPrograms()
-    viuProgramsCache.set('programs', results)
+    if (results) viuProgramsCache.set('programs', results)
     return results
   } catch (e) {
     console.error(e)
