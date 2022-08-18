@@ -26,7 +26,10 @@ exports.jobsByProgram = async function (req, res) {
 
   // If there is no program, return a 404.
   if (!program) {
-    return res.status(204).send({ data: [], message: 'No jobs found' })
+    console.info(
+      `Not found in searchable programs (Searching NID ${searchedNid})`
+    )
+    return res.status(404).send({ data: [], message: 'No jobs found' })
   }
 
   const { title, noc_search_keywords, known_noc_groups, credential } = program
@@ -43,7 +46,7 @@ exports.jobsByProgram = async function (req, res) {
   // Collecting Jobs From Known Keywords - If Any
   if (knownKeywords) {
     const keywords = {
-      credential: [...ensureArray(credential)],
+      credential,
       searchKeywords: [...ensureArray(knownKeywords)],
     }
     const results = findJobsByCredentialSearch(keywords)
@@ -70,7 +73,7 @@ exports.jobsByProgram = async function (req, res) {
 
   // Lastly, do an organic search on the program using it's title and credential properties.
   const programKeywords = {
-    credential: [...ensureArray(credential)],
+    credential,
     searchKeywords: [...ensureArray(title)],
   }
 
@@ -81,9 +84,10 @@ exports.jobsByProgram = async function (req, res) {
       pushIfUnique(jobResults, organicSearchResult)
     )
   }
+  console.log('here', jobResults)
 
   if (!jobResults.length) {
-    return res.status(204).send({ data: [], message: 'No jobs found' })
+    return res.status(404).send({ data: [], message: 'No jobs found' })
   }
 
   res.status(200).send({ data: jobResults, message: 'Jobs found.' })
@@ -106,7 +110,7 @@ exports.getJobs = (req, res) => {
     }
   }
   if (!jobs.length) {
-    return res.status(204).send({ data: [], message: 'No jobs found' })
+    return res.status(404).send({ data: [], message: 'No jobs found' })
   }
   return res.status(200).send({ data: jobs, message: 'Jobs found.' })
 } // MOTHBALL August 12, 2022
@@ -157,7 +161,7 @@ exports.getJobsAndOutlook = async (req, res) => {
   if (knownKeywords) {
     const credential = program.credential
     const keywords = {
-      credential: [...ensureArray(credential)],
+      credential,
       searchKeywords: [...ensureArray(knownKeywords)],
     }
     /** @type {{noc: number, title: string}} */
@@ -189,7 +193,7 @@ exports.getJobsAndOutlook = async (req, res) => {
       ? [...ensureArray(programTitle), ...ensureArray(programKeywords)]
       : [...ensureArray(programTitle)]
     const keywords = {
-      credential: [...ensureArray(credential)],
+      credential,
       search: [...ensureArray(searchkeywords)],
     }
     const results = findJobsByCredentialSearch(keywords)
@@ -203,7 +207,7 @@ exports.getJobsAndOutlook = async (req, res) => {
 
     // We return 204 No Content if we don't find any jobs, adding a message prop for debugging purposes. This message should clearly describe what to do to render search results.
     if (!jobResults.length) {
-      return res.status(204).json({
+      return res.status(404).json({
         data: {},
         message:
           'This program NID does not have nocKeywords or knownGroups properties. This makes it very hard to search for. consider adding one or both of these properties to the program.' +
