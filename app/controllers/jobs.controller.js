@@ -3,9 +3,6 @@ const unitGroups = require('../data/noc/2016/noc_2016_unit_groups.json')
 const searchablePrograms = require('../data/viu/searchable_programs.json') // NOTE: Only using searchable programs. Not all programs will return results.
 const { getProgram } = require('../helpers/viu_data.helpers.js')
 
-// STORES
-const { getViuPrograms } = require('../stores')
-
 // HELPERS
 const findJobsByCredentialSearch = require('../lib/findJobsByCredentialSearch.js')
 const { pushIfUnique, ensureArray } = require('../helpers/array.helpers.js')
@@ -32,14 +29,7 @@ exports.jobsByProgram = async function (req, res) {
     return res.status(204).send({ data: [], message: 'No jobs found' })
   }
 
-  const {
-    nid,
-    title,
-    noc_search_keywords,
-    known_noc_groups,
-    credential,
-    field_viu_search_keywords,
-  } = program
+  const { title, noc_search_keywords, known_noc_groups, credential } = program
 
   // Extract NOC searchable keywords (searched using the search() helper function)
   const knownKeywords = noc_search_keywords

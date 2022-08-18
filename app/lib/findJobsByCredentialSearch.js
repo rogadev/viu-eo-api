@@ -12,7 +12,7 @@ const allUnitGroups = require('../data/noc/2016/noc_2016_unit_groups.json')
  */
 module.exports = ({ credential, searchKeywords }) => {
   // Validate that we have both a credential and search terms. Return empty if not. Note: this should be caught by middleware prior to getting here.
-  if (!credential || !searchKeywords)
+  if (!credential.length || !searchKeywords.length)
     throw new Error('Missing credential or search keywords')
 
   // Filter out unit groups that require years of experience - we want results that are GRADUATE LEVEL ONLY.
@@ -83,7 +83,7 @@ function keywordCombinator(arr1, arr2) {
   const results = []
   for (const item1 of arr1) {
     for (const item2 of arr2) {
-      pushIfUnique(results, [item1, item2])
+      pushIfUnique(results, [item1.toLowerCase(), item2.toLowerCase()])
     }
   }
   return results
