@@ -139,7 +139,7 @@ exports.getJobsAndOutlook = async (req, res) => {
     })
   }
 
-  // NOTE: known keywords and known groups are found on the "searchable" list of VIU programs. Not all programs on the VIU program list will return resutls and not all programs will have known keywords and groups added to them. In the future, it would be advisable to port over these properties from the hard-coded searchable programs list and add them to the program list that we can fetch from VIU data, directly.
+  // NOTE: known keywords and known groups are found on the "searchable" list of VIU programs. Not all programs on the VIU program list will return results and not all programs will have known keywords and groups added to them. In the future, it would be advisable to port over these properties from the hard-coded searchable programs list and add them to the program list that we can fetch from VIU data, directly.
 
   // Extract NOC searchable keywords (searched using the search() helper function)
   /** @type {string[]} */
@@ -189,12 +189,12 @@ exports.getJobsAndOutlook = async (req, res) => {
     if (programTitle) programTitle = programTitle.trim()
     let programKeywords = program?.field_viu_search_keywords
     if (programKeywords) programKeywords = programKeywords.split(',')
-    const searchkeywords = programKeywords
+    const searchKeywords = programKeywords
       ? [...ensureArray(programTitle), ...ensureArray(programKeywords)]
       : [...ensureArray(programTitle)]
     const keywords = {
       credential,
-      search: [...ensureArray(searchkeywords)],
+      search: [...ensureArray(searchKeywords)],
     }
     const results = findJobsByCredentialSearch(keywords)
     results.jobs.forEach((result) => {

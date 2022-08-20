@@ -6,7 +6,7 @@ const { titleCase } = require('../helpers/string.helpers.js')
 const allUnitGroups = require('../data/noc/2016/noc_2016_unit_groups.json')
 
 /**
- * Expands the "credential" keywords. Combines credential keywords and search kewords. Searches Stats Canada's NOC data for jobs that match the expanded keywords to job requirements fields. These resulting unit groups jobs are maped out and returned in the results. Returns an error property if encountered.
+ * Expands the "credential" keywords. Combines credential keywords and search keywords. Searches Stats Canada's NOC data for jobs that match the expanded keywords to job requirements fields. These resulting unit groups jobs are mapped out and returned in the results. Returns an error property if encountered.
  * @param {{credential: string, searchKeywords: string[]}} keywords - An object containing credential keywords and search keywords.
  * @returns an array of job objects related to this search. If no jobs are found, returns an empty array.
  */
@@ -94,7 +94,7 @@ function keywordCombinator(arr1, arr2) {
 }
 
 /**
- * When searching NOC requirements fields, the credential terms require expanding to include more than just one word, as the fields beign searched are not standardized.
+ * When searching NOC requirements fields, the credential terms require expanding to include more than just one word, as the fields searched are not standardized.
  * @param {string} credential - Credential keyword to expand.  e.g. ['degree', 'certificate', 'diploma']
  * @returns Expanded credential keyword(s) e.g. ['degree', 'certificate', 'diploma', 'degree certificate', 'degree diploma', 'certificate diploma']
  */
