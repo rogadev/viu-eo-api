@@ -1,6 +1,6 @@
 // HELPERS
-const { pushIfUnique } = require('../helpers/array.helpers.js')
-const { titleCase } = require('../helpers/string.helpers.js')
+const pushIfUnique = require('../helpers/pushIfUnique.js')
+const titleCase = require('../helpers/titleCase.js')
 
 // DATA
 const allUnitGroups = require('../data/noc/2016/noc_2016_unit_groups.json')

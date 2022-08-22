@@ -5,10 +5,11 @@ const { getProgram } = require('../helpers/viu_data.helpers.js')
 
 // HELPERS
 const findJobsByCredentialSearch = require('../lib/findJobsByCredentialSearch.js')
-const { pushIfUnique, ensureArray } = require('../helpers/array.helpers.js')
+const pushIfUnique = require('../helpers/pushIfUnique.js')
+const ensureArray = require('../helpers/ensureArray.js')
+const titleCase = require('../helpers/titleCase.js')
 const extractJobsFromUnitGroups = require('../lib/extractJobsFromNocUnitGroups.js')
 const { getOutlook } = require('../helpers/outlook.helpers.js')
-const { titleCase } = require('../helpers/string.helpers')
 
 // CONTROLLER FUNCTIONS
 

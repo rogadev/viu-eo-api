@@ -1,4 +1,4 @@
-const { ensureArray } = require('../../helpers/array.helpers.js')
+const ensureArray = require('../../helpers/ensureArray.js')
 const findJobsByCredentialSearch = require('../../lib/findJobsByCredentialSearch.js')
 
 /**

@@ -2,7 +2,7 @@
 const unitGroups = require('../data/noc/2016/noc_2016_unit_groups.json')
 
 // HELPERS
-const { ensureArray } = require('../helpers/array.helpers.js')
+const ensureArray = require('../helpers/ensureArray.js')
 
 /**
  *
