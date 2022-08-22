@@ -1,4 +1,4 @@
-const { ensureArray } = require('../../helpers/array.helpers.js')
+const ensureArray = require('../../helpers/ensureArray.js')
 const findJobsByCredentialSearch = require('../../lib/findJobsByCredentialSearch.js')
 
 /**
@@ -8,14 +8,14 @@ const findJobsByCredentialSearch = require('../../lib/findJobsByCredentialSearch
 module.exports = (req, res) => {
   // Required keywords format for search() helper function
   const keywords = {
-    credential: [...ensureArray(req.query.credential)],
+    credential: req.query.credential,
     searchKeywords: [...ensureArray(req.query.keywords)],
   }
   // Search the data for matching unit groups
   const result = findJobsByCredentialSearch(keywords)
   // If result returns with an error property, send error.
   if (!result.length) {
-    return res.status(204).send({ data: {}, message: 'No jobs found' })
+    return res.status(404).send({ data: {}, message: 'No jobs found' })
   }
   // If no error, send the results.
   res.status(200).send({ data: result, message: 'Jobs found.' })

@@ -1,13 +1,13 @@
 // HELPERS
-const { pushIfUnique } = require('../helpers/array.helpers.js')
-const { titleCase } = require('../helpers/string.helpers.js')
+const pushIfUnique = require('../helpers/pushIfUnique.js')
+const titleCase = require('../helpers/titleCase.js')
 
 // DATA
 const allUnitGroups = require('../data/noc/2016/noc_2016_unit_groups.json')
 
 /**
- * Expands the "credential" keywords. Combines credential keywords and search kewords. Searches Stats Canada's NOC data for jobs that match the expanded keywords to job requirements fields. These resulting unit groups jobs are maped out and returned in the results. Returns an error property if encountered.
- * @param {{credential: string[], searchKeywords: string[]}} keywords - An object containing credential keywords and search keywords.
+ * Expands the "credential" keywords. Combines credential keywords and search keywords. Searches Stats Canada's NOC data for jobs that match the expanded keywords to job requirements fields. These resulting unit groups jobs are mapped out and returned in the results. Returns an error property if encountered.
+ * @param {{credential: string, searchKeywords: string[]}} keywords - An object containing credential keywords and search keywords.
  * @returns an array of job objects related to this search. If no jobs are found, returns an empty array.
  */
 module.exports = ({ credential, searchKeywords }) => {
@@ -43,7 +43,11 @@ module.exports = ({ credential, searchKeywords }) => {
       // ... look through each requirement in the group...
       for (const requirement of requirements) {
         // ...and see if there's a match against the search keywords.
-        if (keywordCombo.every((keyword) => requirement.includes(keyword))) {
+        if (
+          keywordCombo.every((keyword) =>
+            requirement.toLowerCase().includes(keyword.toLowerCase())
+          )
+        ) {
           // If there's a match, add the group to the collector.
           pushIfUnique(groupResults, group)
         }
@@ -81,57 +85,43 @@ module.exports = ({ credential, searchKeywords }) => {
  */
 function keywordCombinator(arr1, arr2) {
   const results = []
-  for (const item1 of arr1) {
-    for (const item2 of arr2) {
-      pushIfUnique(results, [item1.toLowerCase(), item2.toLowerCase()])
-    }
-  }
+  arr1.forEach((item) => {
+    arr2.forEach((item2) => {
+      results.push([item, item2])
+    })
+  })
   return results
 }
 
 /**
- * When searching NOC requirements fields, the credential terms require expanding to include more than just one word, as the fields beign searched are not standardized.
- * @param {string[]} credentials - Credential keyword(s) to expand.  e.g. ['degree', 'certificate', 'diploma']
+ * When searching NOC requirements fields, the credential terms require expanding to include more than just one word, as the fields searched are not standardized.
+ * @param {string} credential - Credential keyword to expand.  e.g. ['degree', 'certificate', 'diploma']
  * @returns Expanded credential keyword(s) e.g. ['degree', 'certificate', 'diploma', 'degree certificate', 'degree diploma', 'certificate diploma']
  */
-function expandCredentials(credentials) {
+function expandCredentials(credential) {
+  let cred = credential.toLowerCase().trim()
   const result = []
-  for (let cred of credentials) {
-    cred = cred.toLowerCase().trim()
 
-    if (cred.includes('degree')) {
-      result.push(
-        'degree',
-        'university program',
-        'university or college',
-        "bachelor's",
-        "master's",
-        'doctoral'
-      )
-    }
-    if (cred.includes('certificate')) {
-      result.push(
-        'certificate',
-        'school programs',
-        'school program',
-        'apprenticeship',
-        'red seal',
-        'trades program',
-        'trades school'
-      )
-    }
-    if (cred.includes('trades')) {
-      result.push(
-        'apprenticeship',
-        'red seal',
-        'trades program',
-        'trades school',
-        'certificate'
-      )
-    }
-    if (cred.includes('diploma')) {
-      result.push('diploma', 'college program', 'college or other program')
-    }
+  if (cred.includes('degree')) {
+    result.push(
+      'degree',
+      'diploma',
+      'university program',
+      'university or college'
+    )
+  } else if (cred.includes('certificate') || cred.includes('trades')) {
+    result.push(
+      'certificate',
+      'school programs',
+      'school program',
+      'apprenticeship',
+      'red seal',
+      'trades program',
+      'trades school'
+    )
+  } else if (cred.includes('diploma')) {
+    result.push('diploma', 'college program', 'college or other program')
   }
+
   return result
 }

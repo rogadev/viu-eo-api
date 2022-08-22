@@ -11,6 +11,7 @@ const programs = require('../../../controllers/program.controller.js')
 const jobs = require('../../../controllers/jobs.controller.js')
 const fix = require('../../../controllers/fix.controller.js')
 const getJobsByCredentialSearch = require('../../../controllers/jobs/getJobsByCredentialSearch.js')
+const getJobsByProgram = require('../../../controllers/jobs/getJobsByProgram.js')
 
 // GET /api/v1/test - Test route.
 router.get('/test', test.test)
@@ -53,7 +54,7 @@ router.get('/jobs/:nid', jobs.getJobsAndOutlook)
 router.get(
   '/jobs/program/:nid',
   jobsMW.requiresProgramNidParam,
-  jobs.jobsByProgram
+  getJobsByProgram
 )
 
 // GET /api/v1/jobs/credential - Returns list of all searchable programs. (requires query params)
