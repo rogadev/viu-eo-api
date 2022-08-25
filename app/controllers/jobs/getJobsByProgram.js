@@ -36,16 +36,15 @@ module.exports = (req, res) => {
 
   // Check program properties for known NOC searchable keywords and groups.
   if (programKeywords) {
-    const foundJobs = addJobsWithKeywordsAndCredential(
+    addJobsWithKeywordsAndCredential(
       programKeywords,
       programCredential,
       jobsCollector
     )
-    foundJobs.forEach((job) => pushUniqueJobObject(job, jobsCollector))
+    console.log(
+      `${jobsCollector.length} jobs found after evaluating for known NOC keywords`
+    )
   }
-  console.log(
-    `${jobsCollector.length} jobs found after evaluating for known NOC keywords`
-  )
 
   if (programNocCodes) {
     addJobsFromKnownGroups(programNocCodes, jobsCollector)
