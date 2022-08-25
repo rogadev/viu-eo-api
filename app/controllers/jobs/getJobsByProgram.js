@@ -1,8 +1,6 @@
 // HELPERS
 const keywordCombinator = require('../../helpers/keywordCombinator.js')
-const pushIfUnique = require('../../helpers/pushIfUnique.js')
 const pushUniqueJobObject = require('../../helpers/pushUniqueJobObject.js')
-const ensureArray = require('../../helpers/ensureArray.js')
 
 // DATA
 const nocData = require('../../data/noc/2016/noc_2016_unit_groups.json')
@@ -43,7 +41,7 @@ module.exports = (req, res) => {
       programCredential,
       jobsCollector
     )
-    // jobsCollector.push(...foundJobs)
+    foundJobs.forEach((job) => pushUniqueJobObject(job, jobsCollector))
   }
   console.log(
     `${jobsCollector.length} jobs found after evaluating for known NOC keywords`
