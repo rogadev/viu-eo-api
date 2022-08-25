@@ -1,8 +1,6 @@
 // HELPERS
 const keywordCombinator = require('../../helpers/keywordCombinator.js')
-const pushIfUnique = require('../../helpers/pushIfUnique.js')
 const pushUniqueJobObject = require('../../helpers/pushUniqueJobObject.js')
-const ensureArray = require('../../helpers/ensureArray.js')
 
 // DATA
 const nocData = require('../../data/noc/2016/noc_2016_unit_groups.json')
@@ -38,16 +36,15 @@ module.exports = (req, res) => {
 
   // Check program properties for known NOC searchable keywords and groups.
   if (programKeywords) {
-    const foundJobs = addJobsWithKeywordsAndCredential(
+    addJobsWithKeywordsAndCredential(
       programKeywords,
       programCredential,
       jobsCollector
     )
-    // jobsCollector.push(...foundJobs)
+    console.log(
+      `${jobsCollector.length} jobs found after evaluating for known NOC keywords`
+    )
   }
-  console.log(
-    `${jobsCollector.length} jobs found after evaluating for known NOC keywords`
-  )
 
   if (programNocCodes) {
     addJobsFromKnownGroups(programNocCodes, jobsCollector)
